@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+/* Box-sizing reset for all elements */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Ensure html and body take full height */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Apply Tailwind utility classes directly */
+html {
+  @apply scroll-smooth antialiased text-gray-800;
+}
+
+body {
+  @apply min-h-screen flex flex-col bg-white text-base leading-relaxed text-gray-900;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessibility focus outlines */
+:focus {
+  outline: 2px solid #f97316; /* Tailwind orange-500 */
+  outline-offset: 2px;
+}
