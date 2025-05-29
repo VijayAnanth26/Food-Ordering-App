@@ -1,5 +1,6 @@
 // frontend/src/app/page.js
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -36,56 +37,70 @@ export default function Home() {
                 <div className="flex items-center space-x-6 lg:space-x-8">
                   <div className="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
                     <div className="h-64 w-44 overflow-hidden rounded-lg sm:opacity-0 lg:opacity-100 transition-transform hover:scale-105">
-                      <img
+                      <Image
                         alt="Food 1"
                         src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
                         className="size-full object-cover"
+                        width={176}
+                        height={256}
                       />
                     </div>
                     <div className="h-64 w-44 overflow-hidden rounded-lg transition-transform hover:scale-105">
-                      <img
+                      <Image
                         alt="Food 2"
                         src="https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg"
                         className="size-full object-cover"
+                        width={176}
+                        height={256}
                       />
                     </div>
                   </div>
                   <div className="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
                     <div className="h-64 w-44 overflow-hidden rounded-lg transition-transform hover:scale-105">
-                      <img
+                      <Image
                         alt="Food 3"
                         src="https://images.pexels.com/photos/2233729/pexels-photo-2233729.jpeg"
                         className="size-full object-cover"
+                        width={176}
+                        height={256}
                       />
                     </div>
                     <div className="h-64 w-44 overflow-hidden rounded-lg transition-transform hover:scale-105">
-                      <img
+                      <Image
                         alt="Food 4"
                         src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092"
                         className="size-full object-cover"
+                        width={176}
+                        height={256}
                       />
                     </div>
                     <div className="h-64 w-44 overflow-hidden rounded-lg transition-transform hover:scale-105">
-                      <img
+                      <Image
                         alt="Food 5"
                         src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c"
                         className="size-full object-cover"
+                        width={176}
+                        height={256}
                       />
                     </div>
                   </div>
                   <div className="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
                     <div className="h-64 w-44 overflow-hidden rounded-lg transition-transform hover:scale-105">
-                      <img
+                      <Image
                         alt="Food 6"
                         src="https://images.unsplash.com/photo-1504674900247-0877df9cc836"
                         className="size-full object-cover"
+                        width={176}
+                        height={256}
                       />
                     </div>
                     <div className="h-64 w-44 overflow-hidden rounded-lg transition-transform hover:scale-105">
-                      <img
+                      <Image
                         alt="Food 7"
                         src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
                         className="size-full object-cover"
+                        width={176}
+                        height={256}
                       />
                     </div>
                   </div>

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -49,10 +50,12 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 px-4">
       <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md space-y-8 border border-orange-100">
         <div className="text-center">
-          <img
+          <Image
             src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=orange&shade=600"
             alt="Fury Foods"
             className="mx-auto h-12 w-auto mb-6"
+            width={48}
+            height={48}
           />
           <h2 className="text-3xl font-extrabold text-orange-600 mb-2">Login to Fury Foods</h2>
         </div>

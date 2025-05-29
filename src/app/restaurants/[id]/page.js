@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useCart } from '@/context/CartContext';
+import Image from 'next/image';
 
 export default function RestaurantMenuPage() {
   const { id } = useParams();
@@ -46,10 +47,12 @@ export default function RestaurantMenuPage() {
                 key={item._id?.toString()}
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl border group"
               >
-                <img
+                <Image
                   src={item.image}
                   alt={item.name}
                   className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-300"
+                  width={400}
+                  height={208}
                 />
                 <div className="p-5">
                   <h2 className="text-xl font-bold text-orange-700">{item.name}</h2>

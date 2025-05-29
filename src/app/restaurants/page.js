@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function RestaurantsPage() {
   const [restaurants, setRestaurants] = useState([]);
@@ -50,11 +51,12 @@ export default function RestaurantsPage() {
                 className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-transform hover:-translate-y-1 overflow-hidden border border-orange-100 group"
                 aria-label={`View ${name}`}
               >
-                
-                <img
+                <Image
                   src={image}
                   alt={name}
                   className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-300"
+                  width={400}
+                  height={208}
                 />
                 <div className="p-5">
                   <h2 className="text-2xl font-bold text-orange-700 mb-2">{name}</h2>
