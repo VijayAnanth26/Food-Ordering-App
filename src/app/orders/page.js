@@ -57,10 +57,17 @@ export default function OrdersPage() {
       alert('Only Admin and Managers can cancel orders.');
       return;
     }
-
+  
     if (window.confirm('Are you sure you want to cancel this order?')) {
       try {
-        // Backend DELETE not implemented yet — mock update
+        const res = await fetch(`/api/orders/${orderId}/cancel`, {
+          method: 'PUT',
+        });
+  
+        if (!res.ok) {
+          throw new Error('Failed to cancel on server');
+        }
+  
         updateOrderStatus(orderId, 'Cancelled');
       } catch (error) {
         console.error('Error cancelling order:', error);
@@ -68,7 +75,7 @@ export default function OrdersPage() {
       }
     }
   };
-
+  
   if (!user) return null;
 
   return (
