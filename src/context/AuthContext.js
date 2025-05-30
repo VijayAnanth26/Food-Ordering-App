@@ -13,15 +13,15 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+
       try {
         const res = await fetch('/api/users');
         const data = await res.json();
         setUsers(data);
-
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
       } catch (err) {
         console.error('Failed to load users:', err);
       } finally {
@@ -51,9 +51,14 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('user');
-    setUser(null); // This triggers the useEffect below
+    setUser(null);
     router.push('/login');
   };
+
+  // ⛔ Don't render children until loading is false
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout, users }}>
