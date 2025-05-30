@@ -8,74 +8,129 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
   const { user } = useAuth();
 
-  // Load from localStorage on mount
+  // Load cart from MongoDB if user is logged in; else from localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) setCart(JSON.parse(savedCart));
+    const loadCart = async () => {
+      if (user) {
+        try {
+          const res = await fetch('/api/cart', {
+            headers: { 'user-id': user._id }
+          });
+          const dbCart = await res.json();
+          setCart(dbCart);
+        } catch (error) {
+          console.error('Failed to load cart from DB:', error);
+        }
+      } else {
+        const savedCart = localStorage.getItem('cart');
+        if (savedCart) setCart(JSON.parse(savedCart));
+      }
+    };
+
+    loadCart();
+  }, [user]);
+
+  // Sync cart to localStorage if not logged in
+  useEffect(() => {
+    if (!user) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+  }, [cart, user]);
+
+  // Sync to MongoDB when cart or user changes
+  useEffect(() => {
+    const syncWithMongo = async () => {
+      if (!user) return;
+
+      try {
+        await fetch('/api/cart', {
+          method: 'DELETE',
+          headers: { 'user-id': user._id },
+        });
+
+        for (const item of cart) {
+          await fetch('/api/cart', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'user-id': user._id
+            },
+            body: JSON.stringify({ ...item, userId: user._id }),
+          });
+        }
+      } catch (err) {
+        console.error('Failed to sync cart with MongoDB:', err);
+      }
+    };
+
+    if (user) {
+      syncWithMongo();
+    }
+  }, [cart, user]);
+
+  // Add item to cart
+  const addToCart = useCallback((item, restaurantId) => {
+    setCart((prev) => {
+      if (prev.length > 0 && prev[0].restaurantId !== restaurantId) {
+        alert("You can only order from one restaurant at a time.");
+        return prev;
+      }
+
+      const existingItem = prev.find(i => i.id === item.id);
+      if (existingItem) {
+        return prev.map(i =>
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        );
+      } else {
+        return [...prev, { ...item, restaurantId, quantity: 1 }];
+      }
+    });
   }, []);
 
-  // Save to localStorage on change
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
-
-  const addToCart = useCallback((item, restaurantId) => {
-    if (cart.length > 0 && cart[0].restaurantId !== restaurantId) {
-      alert("You can only order from one restaurant at a time.");
-      return;
-    }
-
-    const existingItem = cart.find(i => i.id === item.id);
-    if (existingItem) {
-      setCart(cart.map(i =>
-        i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-      ));
-    } else {
-      setCart([...cart, { ...item, restaurantId, quantity: 1 }]);
-    }
-  }, [cart]);
-
   const incrementQuantity = useCallback((itemId) => {
-    setCart(cart.map(item =>
-      item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
-    ));
-  }, [cart]);
+    setCart(prev =>
+      prev.map(item =>
+        item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  }, []);
 
   const decrementQuantity = useCallback((itemId) => {
-    setCart(
-      cart
+    setCart(prev =>
+      prev
         .map(item =>
           item.id === itemId ? { ...item, quantity: item.quantity - 1 } : item
         )
         .filter(item => item.quantity > 0)
     );
-  }, [cart]);
+  }, []);
 
-  const removeFromCart = useCallback(async (itemId) => {
-    try {
-      await fetch(`/api/cart/${itemId}`, {
-        method: 'DELETE',
-        headers: { 'user-id': user?._id },
-      });
-      setCart(cart.filter(item => item.id !== itemId));
-    } catch (error) {
-      console.error('Error removing cart item:', error);
-    }
-  }, [cart, user]);
+  const removeFromCart = useCallback((itemId) => {
+    setCart(prev => prev.filter(item => item.id !== itemId));
+  }, []);
 
   const clearCart = useCallback(() => {
     if (confirm("Are you sure you want to clear the cart?")) {
       setCart([]);
+      if (user) {
+        fetch('/api/cart', {
+          method: 'DELETE',
+          headers: { 'user-id': user._id }
+        }).catch(console.error);
+      } else {
+        localStorage.removeItem('cart');
+      }
     }
-  }, []);
+  }, [user]);
 
+  // Clear cart on logout
   useEffect(() => {
     if (!user) {
-      // If user is null (logged out), clear cart automatically
       setCart([]);
       localStorage.removeItem('cart');
     }
   }, [user]);
+
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
