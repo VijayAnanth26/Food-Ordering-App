@@ -11,16 +11,26 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
   const [country, setCountry] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   // Fetch users from API
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        setLoading(true);
+        setError('');
         const res = await fetch('/api/users');
+        if (!res.ok) {
+          throw new Error('Failed to fetch users');
+        }
         const data = await res.json();
         setUsers(data);
       } catch (err) {
         console.error('Failed to fetch users:', err);
+        setError('Failed to load users. Please try again later.');
+      } finally {
+        setLoading(false);
       }
     };
     fetchUsers();
@@ -30,6 +40,7 @@ export default function LoginPage() {
   const handleEmailChange = (e) => {
     const selectedEmail = e.target.value;
     setEmail(selectedEmail);
+    setError('');
 
     const user = users.find((u) => u.email === selectedEmail);
     if (user) {
@@ -41,9 +52,15 @@ export default function LoginPage() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(email, role, country);
+    try {
+      setError('');
+      await login(email, role, country);
+    } catch (err) {
+      console.error('Login failed:', err);
+      setError('Login failed. Please try again.');
+    }
   };
 
   return (
@@ -61,6 +78,13 @@ export default function LoginPage() {
           </div>
           <h2 className="text-3xl font-extrabold text-orange-600 mb-2">Login to Fury Foods</h2>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email Dropdown */}
           <div>
@@ -69,7 +93,10 @@ export default function LoginPage() {
               value={email}
               onChange={handleEmailChange}
               required
-              className="w-full border rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              disabled={loading}
+              className={`w-full border rounded-md p-2 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
               <option value="">Select Dummy Email</option>
               {users.map(({ email }) => (
@@ -79,6 +106,7 @@ export default function LoginPage() {
               ))}
             </select>
           </div>
+
           {/* Role */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
@@ -93,6 +121,7 @@ export default function LoginPage() {
               {role && <option value={role}>{role}</option>}
             </select>
           </div>
+
           {/* Country */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
@@ -107,17 +136,21 @@ export default function LoginPage() {
               {country && <option value={country}>{country}</option>}
             </select>
           </div>
+
           {/* Submit Button */}
           <div>
             <button
               type="submit"
-              className="w-full bg-orange-600 hover:bg-orange-500 text-white font-semibold py-2 rounded-md transition duration-200 shadow"
-              disabled={!email}
+              disabled={!email || loading}
+              className={`w-full bg-orange-600 hover:bg-orange-500 text-white font-semibold py-2 rounded-md transition duration-200 shadow ${
+                (!email || loading) ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              Login
+              {loading ? 'Loading...' : 'Login'}
             </button>
           </div>
         </form>
+
         <p className="text-center text-sm text-gray-500">
           New to Fury Foods? <span className="text-orange-600 font-medium">Ask Nick Fury</span>
         </p>
