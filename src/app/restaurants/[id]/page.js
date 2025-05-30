@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function RestaurantMenuPage() {
   const { id } = useParams();
@@ -34,6 +35,9 @@ export default function RestaurantMenuPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white pt-8">
       <div className="max-w-5xl mx-auto p-6">
+      <Link href="/restaurants" className="text-orange-500 hover:underline text-sm mb-4 inline-block">
+  ← Back to Restaurants
+</Link>
         <h1 className="text-4xl font-extrabold text-center text-orange-600 mb-10 drop-shadow">
           Menu {id ? `for Restaurant ID: ${id}` : ''}
         </h1>
