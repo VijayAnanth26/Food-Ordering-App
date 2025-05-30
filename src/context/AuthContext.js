@@ -50,14 +50,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    setUser(null);
     localStorage.removeItem('user');
+    setUser(null); // This triggers the useEffect below
     router.push('/login');
   };
-
-  if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
-  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout, users }}>

@@ -69,6 +69,13 @@ export function CartProvider({ children }) {
     }
   }, []);
 
+  useEffect(() => {
+    if (!user) {
+      // If user is null (logged out), clear cart automatically
+      setCart([]);
+      localStorage.removeItem('cart');
+    }
+  }, [user]);
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (

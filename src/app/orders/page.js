@@ -25,8 +25,12 @@ export default function OrdersPage() {
       if (!user?._id) return;
       try {
         const res = await fetch("/api/orders", {
-          headers: { "user-id": user._id },
+          headers: { 
+            "user-id": user._id,
+            "Content-Type": "application/json"
+          },
         });
+        if (!res.ok) throw new Error('Failed to fetch orders');
         const data = await res.json();
         setOrders(data);
       } catch (error) {
@@ -59,13 +63,16 @@ export default function OrdersPage() {
       try {
         const res = await fetch(`/api/orders/${orderId}`, {
           method: 'DELETE',
-          headers: { "user-id": user._id }
+          headers: { 
+            "user-id": user._id,
+            "Content-Type": "application/json"
+          }
         });
-
+        
         if (!res.ok) throw new Error('Failed to cancel order');
-
+        
         setOrders((prev) => prev.map((o) =>
-          o.id === orderId ? { ...o, status: 'Cancelled' } : o
+          o._id === orderId ? { ...o, status: 'Cancelled' } : o
         ));
         cancelOrder(orderId); // Update local context
       } catch (error) {
@@ -97,11 +104,11 @@ export default function OrdersPage() {
         ) : (
           <div className="space-y-6">
             {filteredOrders.map((order) => (
-              <div key={order.id} className="bg-white rounded-lg shadow-md p-6">
+              <div key={order._id} className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <p className="text-xs text-gray-400">Order ID: {order.id}</p>
-                    <p className="text-xs text-gray-400">Date: {order.date}</p>
+                    <p className="text-xs text-gray-400">Order ID: {order._id}</p>
+                    <p className="text-xs text-gray-400">Date: {new Date(order.createdAt).toLocaleString()}</p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                     order.status === 'Placed'
@@ -126,7 +133,7 @@ export default function OrdersPage() {
                   {order.items && order.items.length > 0 ? (
                     <ul className="space-y-1 text-sm">
                       {order.items.map((item, index) => (
-                        <li key={index} className="flex justify-between text-gray-700">
+                        <li key={`${order._id}-${item._id || index}`} className="flex justify-between text-gray-700">
                           <span>{item.name} × {item.quantity || 1}</span>
                           <span>₹{item.price * (item.quantity || 1)}</span>
                         </li>
@@ -143,7 +150,7 @@ export default function OrdersPage() {
                 {canCancelOrder && order.status === 'Placed' && (
                   <div className="mt-4 pt-4 border-t">
                     <button
-                      onClick={() => handleCancelOrder(order.id)}
+                      onClick={() => handleCancelOrder(order._id)}
                       className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors text-sm font-medium"
                     >
                       Cancel Order
