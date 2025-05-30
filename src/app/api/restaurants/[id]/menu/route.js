@@ -17,22 +17,21 @@ export async function GET(request, { params }) {
 
     // Assuming menuItems.restaurantId is stored as ObjectId
     const menuItems = await db.collection('menuItems')
-  .find({ restaurantId: objectId })
-  .toArray();
+      .find({ restaurantId: objectId })
+      .toArray();
 
-const mapped = menuItems.map(item => ({
-  ...item,
-  id: item._id.toString(),
-  _id: undefined, // optional: remove _id if not needed
-}));
+    const mapped = menuItems.map(item => ({
+      ...item,
+      id: item._id.toString(),
+      _id: undefined, // optional: remove _id if not needed
+    }));
 
-return new Response(JSON.stringify({
-  restaurantName: restaurant.name,
-  menuItems: mapped
-}), { status: 200 });
+    return new Response(JSON.stringify({
+      restaurantName: restaurant.name,
+      menuItems: mapped
+    }), { status: 200 });
 
   } catch (error) {
-    console.error('Menu fetch error:', error);
-    return new Response(JSON.stringify({ message: 'Server error', error }), { status: 500 });
+    return new Response(JSON.stringify({ message: 'Server error' }), { status: 500 });
   }
 }

@@ -49,7 +49,7 @@ export async function POST(req) {
     const order = {
       items,
       total,
-      paymentMethod: paymentMethod?.name || "N/A",
+      paymentMethod: paymentMethod,
       status: "Ordered",
       createdAt: new Date(),
       userId: new ObjectId(userId),

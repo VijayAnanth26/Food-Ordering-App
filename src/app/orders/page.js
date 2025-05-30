@@ -29,6 +29,7 @@ export default function OrdersPage() {
         });
         if (!res.ok) throw new Error('Failed to fetch orders');
         const data = await res.json();
+        
         setOrders(data);
       } catch (error) {
         console.error('Error fetching orders:', error);
@@ -111,7 +112,9 @@ export default function OrdersPage() {
                   <p><span className="font-medium">User:</span> {order.userEmail}</p>
                   <p><span className="font-medium">Role:</span> {order.userRole}</p>
                   <p><span className="font-medium">Country:</span> {order.userCountry}</p>
-                  <p><span className="font-medium">Payment:</span> {order.paymentMethod || 'N/A'}</p>
+                  <p><span className="font-medium">Payment:</span> {order.paymentMethod?.name || "N/A"}
+</p>
+
                 </div>
 
                 <div className="border-t pt-4">

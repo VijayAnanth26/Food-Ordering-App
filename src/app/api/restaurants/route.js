@@ -2,9 +2,10 @@
 import clientPromise from '@/utils/mongodb';
 
 export async function GET() {
+  const client = await clientPromise;
+  const db = client.db('foodOrdering');
+
   try {
-    const client = await clientPromise;
-    const db = client.db('foodOrdering');
     const restaurants = await db.collection('restaurants').find({}).toArray();
 
     // Convert _id to id (string)

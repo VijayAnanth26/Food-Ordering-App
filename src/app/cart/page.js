@@ -14,7 +14,6 @@ export default function CartPage() {
   const { paymentMethods, selectedMethod, setSelectedMethod } = usePayment();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  
 
   const handlePlaceOrder = async () => {
     if (!selectedMethod) {
@@ -33,7 +32,7 @@ export default function CartPage() {
         body: JSON.stringify({
           userId: user._id,
           items: cart,
-          paymentMethod: selectedMethod.name,
+          paymentMethod: selectedMethod,
           total
         }),
       });
@@ -41,8 +40,7 @@ export default function CartPage() {
       if (!res.ok) throw new Error('Failed to place order');
   
       const newOrder = await res.json();
-router.push(`/orders?newOrderId=${newOrder._id}`);
-
+      router.push(`/orders?newOrderId=${newOrder._id}`);
   
       // Simulate delay (2 seconds)
       await new Promise((resolve) => setTimeout(resolve, 2000));
