@@ -44,7 +44,7 @@ export default function RestaurantsPage() {
 
         {restaurants.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {restaurants.map(({ _id, name, cuisine, city, image }) => (
+            {restaurants.map(({ _id, name, cuisine, city, image }, index) => (
               <Link
                 key={_id.toString()}
                 href={`/restaurants/${_id.toString()}`}
@@ -55,8 +55,10 @@ export default function RestaurantsPage() {
                   src={image}
                   alt={name}
                   className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-300"
-                  width={400}
-                  height={208}
+                  width={800}
+                  height={416}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority={index < 3}
                 />
                 <div className="p-5">
                   <h2 className="text-2xl font-bold text-orange-700 mb-2">{name}</h2>

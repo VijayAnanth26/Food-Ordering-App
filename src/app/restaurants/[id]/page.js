@@ -10,6 +10,7 @@ export default function RestaurantMenuPage() {
   const { id } = useParams();
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [restaurantName, setRestaurantName] = useState('');
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -20,10 +21,12 @@ export default function RestaurantMenuPage() {
         const res = await fetch(`/api/restaurants/${id}/menu`);
         if (!res.ok) throw new Error('Failed to fetch menu');
         const data = await res.json();
-        setMenuItems(data);
+        setMenuItems(data.menuItems || []);
+        setRestaurantName(data.restaurantName || 'Restaurant');
       } catch (err) {
         console.error(err);
         setMenuItems([]);
+        setRestaurantName('Restaurant');
       } finally {
         setLoading(false);
       }
@@ -39,16 +42,16 @@ export default function RestaurantMenuPage() {
   ← Back to Restaurants
 </Link>
         <h1 className="text-4xl font-extrabold text-center text-orange-600 mb-10 drop-shadow">
-          Menu {id ? `for Restaurant ID: ${id}` : ''}
+          {restaurantName}
         </h1>
 
         {loading ? (
           <p className="text-center text-gray-500 mt-12">Loading menu...</p>
         ) : menuItems.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {menuItems.map((item) => (
+            {menuItems.map((item, index) => (
               <div
-                key={item._id?.toString()}
+                key={item._id?.toString() || `menu-item-${index}`}
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl border group"
               >
                 <Image
