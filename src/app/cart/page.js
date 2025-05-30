@@ -20,7 +20,7 @@ export default function CartPage() {
       alert('Please select a payment method.');
       return;
     }
-
+  
     setLoading(true);
     try {
       const res = await fetch('/api/orders', {
@@ -36,10 +36,14 @@ export default function CartPage() {
           total
         }),
       });
-
+  
       if (!res.ok) throw new Error('Failed to place order');
-
+  
       const orderId = await res.json();
+  
+      // Simulate delay (2 seconds)
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+  
       clearCart();
       router.push(`/orders?newOrderId=${orderId}`);
     } catch (error) {
@@ -49,6 +53,7 @@ export default function CartPage() {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white p-8">
@@ -101,19 +106,20 @@ export default function CartPage() {
                 Select Payment Method:
               </label>
               <select
-                value={selectedMethod?.id || ''}
-                onChange={(e) =>
-                  setSelectedMethod(paymentMethods.find(m => m.id === e.target.value))
-                }
-                className="border border-gray-300 px-4 py-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-orange-500"
-              >
-                <option value="">-- Choose a payment method --</option>
-                {paymentMethods.map(method => (
-                  <option key={method.id} value={method.id}>
-                    {method.name}
-                  </option>
-                ))}
-              </select>
+  value={selectedMethod?.name || ""}
+  onChange={(e) => {
+    const selected = paymentMethods.find(m => m.name === e.target.value);
+    setSelectedMethod(selected);
+  }}
+>
+  <option value="">Select payment method</option>
+  {paymentMethods.map((method) => (
+    <option key={method._id} value={method.name}>
+      {method.name}
+    </option>
+  ))}
+</select>
+
             </div>
 
             <div className="flex justify-between items-center mb-6">

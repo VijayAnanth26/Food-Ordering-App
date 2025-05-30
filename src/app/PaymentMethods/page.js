@@ -28,17 +28,18 @@ export default function PaymentPage() {
       <h1 className="text-2xl font-bold mb-4">Manage Payment Methods</h1>
 
       <ul className="mb-4 space-y-2">
-        {paymentMethods.map((method) => (
-          <li key={method.id} className="flex justify-between items-center bg-white p-3 shadow rounded">
-            <span>{method.name}</span>
-            <button
-              onClick={() => removePaymentMethod(method.id)}
-              className="text-red-600 hover:underline"
-            >
-              Delete
-            </button>
-          </li>
-        ))}
+      {paymentMethods.map((method) => (
+  <li key={method._id} className="flex justify-between items-center bg-white p-3 shadow rounded">
+    <span>{method.name}</span>
+    <button
+      onClick={() => removePaymentMethod(method._id)}
+      className="text-red-600 hover:underline"
+    >
+      Delete
+    </button>
+  </li>
+))}
+
       </ul>
 
       <div className="flex gap-2">

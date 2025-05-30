@@ -50,13 +50,15 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100 px-4">
       <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md space-y-8 border border-orange-100">
         <div className="text-center">
-          <Image
-            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=orange&shade=600"
-            alt="Fury Foods"
-            className="mx-auto h-12 w-auto mb-6"
-            width={48}
-            height={48}
-          />
+          <div className="relative w-12 h-12 mx-auto mb-6">
+            <Image
+              src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=orange&shade=600"
+              alt="Fury Foods"
+              fill
+              style={{ objectFit: 'contain' }}
+              priority
+            />
+          </div>
           <h2 className="text-3xl font-extrabold text-orange-600 mb-2">Login to Fury Foods</h2>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">

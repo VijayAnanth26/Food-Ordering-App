@@ -6,26 +6,23 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 export default function OrdersPage() {
-  const { orders: contextOrders, cancelOrder } = useOrders();
+  const { orders, setOrders, updateOrderStatus } = useOrders();
   const { user } = useAuth();
   const router = useRouter();
-  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Redirect if not logged in
   useEffect(() => {
     if (!user) {
       router.push('/login');
     }
   }, [user, router]);
 
-  // Fetch orders from backend
   useEffect(() => {
     async function fetchOrders() {
       if (!user?._id) return;
       try {
         const res = await fetch("/api/orders", {
-          headers: { 
+          headers: {
             "user-id": user._id,
             "Content-Type": "application/json"
           },
@@ -40,17 +37,18 @@ export default function OrdersPage() {
       }
     }
     if (user) fetchOrders();
-  }, [user]);
+  }, [user, setOrders]);
 
   const filteredOrders = useMemo(() => {
     if (!user) return [];
-    if (user.role === 'Admin') return orders;
+    if (user.role?.toLowerCase() === 'admin') return orders;
     return orders.filter((order) => order.userCountry === user.country);
   }, [orders, user]);
 
   const canCancelOrder = useMemo(() => {
     if (!user) return false;
-    return user.role === 'Admin' || user.role.startsWith('Manager');
+    const role = user.role?.toLowerCase();
+    return role === 'admin' || role.startsWith('manager');
   }, [user]);
 
   const handleCancelOrder = async (orderId) => {
@@ -61,20 +59,8 @@ export default function OrdersPage() {
 
     if (window.confirm('Are you sure you want to cancel this order?')) {
       try {
-        const res = await fetch(`/api/orders/${orderId}`, {
-          method: 'DELETE',
-          headers: { 
-            "user-id": user._id,
-            "Content-Type": "application/json"
-          }
-        });
-        
-        if (!res.ok) throw new Error('Failed to cancel order');
-        
-        setOrders((prev) => prev.map((o) =>
-          o._id === orderId ? { ...o, status: 'Cancelled' } : o
-        ));
-        cancelOrder(orderId); // Update local context
+        // Backend DELETE not implemented yet — mock update
+        updateOrderStatus(orderId, 'Cancelled');
       } catch (error) {
         console.error('Error cancelling order:', error);
         alert('Failed to cancel order. Please try again.');
@@ -111,13 +97,13 @@ export default function OrdersPage() {
                     <p className="text-xs text-gray-400">Date: {new Date(order.createdAt).toLocaleString()}</p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    order.status === 'Placed'
+                    order.status?.toLowerCase() === 'ordered'
                       ? 'bg-green-100 text-green-800'
-                      : order.status === 'Cancelled'
+                      : order.status?.toLowerCase() === 'cancelled'
                       ? 'bg-red-100 text-red-800'
                       : 'bg-gray-100 text-gray-800'
                   }`}>
-                    {order.status}
+                    {order.status?.charAt(0).toUpperCase() + order.status?.slice(1).toLowerCase()}
                   </span>
                 </div>
 
@@ -133,7 +119,7 @@ export default function OrdersPage() {
                   {order.items && order.items.length > 0 ? (
                     <ul className="space-y-1 text-sm">
                       {order.items.map((item, index) => (
-                        <li key={`${order._id}-${item._id || index}`} className="flex justify-between text-gray-700">
+                        <li key={`${order._id}-${index}`} className="flex justify-between text-gray-700">
                           <span>{item.name} × {item.quantity || 1}</span>
                           <span>₹{item.price * (item.quantity || 1)}</span>
                         </li>
@@ -147,7 +133,7 @@ export default function OrdersPage() {
                   </p>
                 </div>
 
-                {canCancelOrder && order.status === 'Placed' && (
+                {canCancelOrder && order.status?.toLowerCase() === 'ordered' && (
                   <div className="mt-4 pt-4 border-t">
                     <button
                       onClick={() => handleCancelOrder(order._id)}
