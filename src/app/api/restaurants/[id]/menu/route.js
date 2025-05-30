@@ -1,8 +1,10 @@
 import clientPromise from '@/utils/mongodb';
 import { ObjectId } from 'mongodb';
 
-export async function GET(request, { params }) {
+export async function GET(request, context) {
+  const { params } = await context;
   const restaurantId = params.id;
+
 
   try {
     const client = await clientPromise;
