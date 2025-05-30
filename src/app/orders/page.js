@@ -1,132 +1,150 @@
-// "frontend/src/app/orders/page.js":
 'use client';
 
 import { useOrders } from '@/context/OrdersContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function OrdersPage() {
-  const { orders, cancelOrder } = useOrders();
+  const { orders: contextOrders, cancelOrder } = useOrders();
   const { user } = useAuth();
   const router = useRouter();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Redirect if not logged in
   useEffect(() => {
     if (!user) {
       router.push('/login');
     }
   }, [user, router]);
 
-  // Filter orders based on user's role and country
+  // Fetch orders from backend
+  useEffect(() => {
+    async function fetchOrders() {
+      if (!user?._id) return;
+      try {
+        const res = await fetch("/api/orders", {
+          headers: { "user-id": user._id },
+        });
+        const data = await res.json();
+        setOrders(data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) fetchOrders();
+  }, [user]);
+
   const filteredOrders = useMemo(() => {
     if (!user) return [];
-    
-    // Admin can see all orders
     if (user.role === 'Admin') return orders;
-    
-    // Managers and Members can only see orders from their country
-    return orders.filter(order => order.userCountry === user.country);
+    return orders.filter((order) => order.userCountry === user.country);
   }, [orders, user]);
 
-  // Check if user can cancel orders
   const canCancelOrder = useMemo(() => {
     if (!user) return false;
     return user.role === 'Admin' || user.role.startsWith('Manager');
   }, [user]);
 
-  const handleCancelOrder = (orderId) => {
+  const handleCancelOrder = async (orderId) => {
     if (!canCancelOrder) {
       alert('Only Admin and Managers can cancel orders.');
       return;
     }
 
     if (window.confirm('Are you sure you want to cancel this order?')) {
-      cancelOrder(orderId);
+      try {
+        const res = await fetch(`/api/orders/${orderId}`, {
+          method: 'DELETE',
+          headers: { "user-id": user._id }
+        });
+
+        if (!res.ok) throw new Error('Failed to cancel order');
+
+        setOrders((prev) => prev.map((o) =>
+          o.id === orderId ? { ...o, status: 'Cancelled' } : o
+        ));
+        cancelOrder(orderId); // Update local context
+      } catch (error) {
+        console.error('Error cancelling order:', error);
+        alert('Failed to cancel order. Please try again.');
+      }
     }
   };
 
-  if (!user) {
-    return null; // Will redirect in useEffect
-  }
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-orange-700">Your Orders</h1>
-          <div className="text-sm text-gray-600">
-            <span className="font-medium">Role:</span> {user.role}
+          <div className="text-sm text-gray-600 text-right">
+            <div><span className="font-medium">Role:</span> {user.role}</div>
             {user.country && (
-              <span className="ml-4">
-                <span className="font-medium">Country:</span> {user.country}
-              </span>
+              <div><span className="font-medium">Country:</span> {user.country}</div>
             )}
           </div>
         </div>
 
-        {filteredOrders.length === 0 ? (
-          <p className="text-gray-500">No orders found.</p>
+        {loading ? (
+          <p className="text-center text-gray-500">Loading orders...</p>
+        ) : filteredOrders.length === 0 ? (
+          <p className="text-gray-500 text-center">No orders found.</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {filteredOrders.map((order) => (
-              <div key={order.id} className="bg-white rounded-lg shadow p-6">
+              <div key={order.id} className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <p className="text-sm text-gray-500">Order ID: {order.id}</p>
-                    <p className="text-sm text-gray-500">Date: {order.date}</p>
+                    <p className="text-xs text-gray-400">Order ID: {order.id}</p>
+                    <p className="text-xs text-gray-400">Date: {order.date}</p>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      order.status === 'Placed'
-                        ? 'bg-green-100 text-green-800'
-                        : order.status === 'Cancelled'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    order.status === 'Placed'
+                      ? 'bg-green-100 text-green-800'
+                      : order.status === 'Cancelled'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
                     {order.status}
                   </span>
                 </div>
 
-                <div className="space-y-2 mb-4">
-  <p>
-    <span className="font-medium text-gray-800">User:</span> {order.userEmail}
-  </p>
-  <p>
-    <span className="font-medium text-gray-800">Role:</span> {order.userRole}
-  </p>
-  <p>
-    <span className="font-medium text-gray-800">Country:</span> {order.userCountry}
-  </p>
-  <p>
-    <span className="font-medium text-gray-800">Payment Method:</span>{' '}
-    {order.paymentMethod || 'N/A'}
-  </p>
-</div>
+                <div className="text-sm text-gray-700 space-y-1 mb-4">
+                  <p><span className="font-medium">User:</span> {order.userEmail}</p>
+                  <p><span className="font-medium">Role:</span> {order.userRole}</p>
+                  <p><span className="font-medium">Country:</span> {order.userCountry}</p>
+                  <p><span className="font-medium">Payment:</span> {order.paymentMethod || 'N/A'}</p>
+                </div>
 
-
-                <div className="border-t border-gray-200 pt-4">
-                  <h3 className="font-semibold mb-2">Items:</h3>
-                  <ul className="space-y-2">
-                    {order.items.map((item, index) => (
-                      <li key={index} className="flex justify-between text-sm">
-                        <span>{item.name}</span>
-                        <span>₹{item.price}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <p className="text-right font-bold">
-                      Total: <span className="text-orange-600">₹{order.total}</span>
-                    </p>
-                  </div>
+                <div className="border-t pt-4">
+                  <h3 className="font-semibold text-gray-800 mb-2">Items:</h3>
+                  {order.items && order.items.length > 0 ? (
+                    <ul className="space-y-1 text-sm">
+                      {order.items.map((item, index) => (
+                        <li key={index} className="flex justify-between text-gray-700">
+                          <span>{item.name} × {item.quantity || 1}</span>
+                          <span>₹{item.price * (item.quantity || 1)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-gray-500">No items in this order.</p>
+                  )}
+                  <p className="text-right text-lg font-bold text-orange-700 mt-4">
+                    Total: ₹{order.total}
+                  </p>
                 </div>
 
                 {canCancelOrder && order.status === 'Placed' && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="mt-4 pt-4 border-t">
                     <button
                       onClick={() => handleCancelOrder(order.id)}
-                      className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
+                      className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors text-sm font-medium"
                     >
                       Cancel Order
                     </button>
