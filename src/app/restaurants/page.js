@@ -10,7 +10,7 @@ export default function RestaurantsPage() {
   useEffect(() => {
     (async () => {
       try {
-        const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const storedUser = JSON.parse(sessionStorage.getItem('user') || '{}');
         const { role, country } = storedUser;
 
         if (!role || !country) {
