@@ -13,9 +13,9 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+      const sessionUser = sessionStorage.getItem('user');
+      if (sessionUser) {
+        setUser(JSON.parse(sessionUser));
       }
 
       try {
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
     if (match) {
       setUser(match);
-      localStorage.setItem('user', JSON.stringify(match));
+      sessionStorage.setItem('user', JSON.stringify(match)); // 🔁 persist for session only
       router.push('/');
     } else {
       alert('Invalid credentials. Please try again.');
@@ -50,12 +50,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
     setUser(null);
     router.push('/login');
   };
 
-  // ⛔ Don't render children until loading is false
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }

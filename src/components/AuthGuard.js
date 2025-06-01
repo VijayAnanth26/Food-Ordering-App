@@ -11,13 +11,12 @@ export default function AuthGuard({ children }) {
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Avoid redirect loop
     if (!user && pathname !== '/login') {
       router.push('/login');
     } else {
       setCheckingAuth(false);
     }
-  }, [user, pathname, router]);
+  }, [user, pathname, router]);  
 
   if (checkingAuth) {
     return <div className="flex items-center justify-center h-screen">Checking auth...</div>;
