@@ -8,7 +8,7 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
   const { user } = useAuth();
 
-  // Load cart from MongoDB if user is logged in; else from localStorage
+  // Load cart from MongoDB if user is logged in; else from sessionStorage
   useEffect(() => {
     const loadCart = async () => {
       if (user) {
@@ -22,7 +22,7 @@ export function CartProvider({ children }) {
           console.error('Failed to load cart from DB:', error);
         }
       } else {
-        const savedCart = localStorage.getItem('cart');
+        const savedCart = sessionStorage.getItem('cart');
         if (savedCart) setCart(JSON.parse(savedCart));
       }
     };
@@ -30,10 +30,10 @@ export function CartProvider({ children }) {
     loadCart();
   }, [user]);
 
-  // Sync cart to localStorage if not logged in
+  // Sync cart to sessionStorage if not logged in
   useEffect(() => {
     if (!user) {
-      localStorage.setItem('cart', JSON.stringify(cart));
+      sessionStorage.setItem('cart', JSON.stringify(cart));
     }
   }, [cart, user]);
 
@@ -118,7 +118,7 @@ export function CartProvider({ children }) {
           headers: { 'user-id': user._id }
         }).catch(console.error);
       } else {
-        localStorage.removeItem('cart');
+        sessionStorage.removeItem('cart');
       }
     }
   }, [user]);
@@ -127,7 +127,7 @@ export function CartProvider({ children }) {
   useEffect(() => {
     if (!user) {
       setCart([]);
-      localStorage.removeItem('cart');
+      sessionStorage.removeItem('cart');
     }
   }, [user]);
 
