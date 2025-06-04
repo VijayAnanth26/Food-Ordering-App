@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useState, useRef, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import LanguageSwitcher from './LanguageSwitcher';
 import {
   HomeIcon,
   BuildingStorefrontIcon,
@@ -75,6 +76,9 @@ export default function Navbar() {
                 <span>Cart ({cart.length})</span>
               </button>
             )}
+
+            {/* Language Switcher */}
+            <LanguageSwitcher />
 
             {/* User Menu */}
             {user ? (
@@ -157,6 +161,9 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden bg-orange-600 text-white px-4 py-3 space-y-3">
+          {/* Language Switcher */}
+          <LanguageSwitcher />
+
           <Link href="/" onClick={() => setMenuOpen(false)} className={navLinkClass('/')}>
             <HomeIcon className="w-5 h-5" />
             Home

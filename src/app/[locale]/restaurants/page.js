@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import AuthGuard from '@/components/AuthGuard';
 
 export default function RestaurantsPage() {
   const [restaurants, setRestaurants] = useState([]);
@@ -36,6 +37,7 @@ export default function RestaurantsPage() {
   }, []);
 
   return (
+    <AuthGuard>
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white pt-8">
       <div className="max-w-6xl mx-auto p-6">
         <h1 className="text-4xl font-extrabold text-center text-orange-600 mb-10 drop-shadow">
@@ -80,5 +82,6 @@ export default function RestaurantsPage() {
         )}
       </div>
     </div>
+    </AuthGuard>
   );
 }
