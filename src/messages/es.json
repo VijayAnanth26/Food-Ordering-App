@@ -1,0 +1,20 @@
+{
+  "common": {
+    "welcome": "Bienvenido a Fury Foods",
+    "browseRestaurants": "Explorar Restaurantes",
+    "loading": "Cargando...",
+    "noRestaurants": "No hay restaurantes disponibles en tu región",
+    "orders": {
+      "title": "Tus Pedidos",
+      "role": "Rol",
+      "country": "País",
+      "orderId": "ID del Pedido",
+      "date": "Fecha",
+      "status": {
+        "ordered": "Pedido",
+        "cancelled": "Cancelado"
+      },
+      "noOrders": "No se encontraron pedidos"
+    }
+  }
+} 
