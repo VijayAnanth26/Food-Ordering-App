@@ -26,6 +26,9 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
 
+  // Calculate total items in cart
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
   const isActive = (href) => pathname === href;
   const navLinkClass = (href) =>
     `flex items-center gap-1 hover:text-orange-200 ${isActive(href) ? 'underline underline-offset-4' : ''}`;
@@ -73,7 +76,7 @@ export default function Navbar() {
                 className="relative flex items-center gap-1 hover:text-orange-200 focus:outline-none"
               >
                 <ShoppingCartIcon className="w-6 h-6" />
-                <span>Cart ({cart.length})</span>
+                <span>Cart ({totalItems})</span>
               </button>
             )}
 
@@ -187,7 +190,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 bg-orange-700 px-3 py-2 rounded hover:bg-orange-800"
               >
                 <ShoppingCartIcon className="w-5 h-5" />
-                Cart ({cart.length})
+                Cart ({totalItems})
               </button>
               <Link
                 href="/dashboard"

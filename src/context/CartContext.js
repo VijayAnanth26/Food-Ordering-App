@@ -6,46 +6,70 @@ const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
-  const { user } = useAuth();
+  const [cartLoaded, setCartLoaded] = useState(false); // ✅ Track if cart has been initialized
+  const { user, loading } = useAuth();
 
-  // Load cart from MongoDB if user is logged in; else from sessionStorage
+  // Clear session storage on login
   useEffect(() => {
+    if (user && sessionStorage.getItem('cart')) {
+      sessionStorage.removeItem('cart');
+    }
+  }, [user]);
+
+  // Load cart from DB or sessionStorage
+  useEffect(() => {
+    if (loading) return;
+
     const loadCart = async () => {
-      if (user) {
+      if (user && user._id) {
         try {
           const res = await fetch('/api/cart', {
-            headers: { 'user-id': user._id }
+            headers: {
+              'user-id': user._id,
+              'user-role': user.role,
+              'user-country': user.country,
+            },
           });
-          const dbCart = await res.json();
-          setCart(dbCart);
+          if (res.ok) {
+            const dbCart = await res.json();
+            setCart(dbCart);
+          }
         } catch (error) {
           console.error('Failed to load cart from DB:', error);
         }
       } else {
         const savedCart = sessionStorage.getItem('cart');
-        if (savedCart) setCart(JSON.parse(savedCart));
+        if (savedCart) {
+          setCart(JSON.parse(savedCart));
+        }
       }
+
+      setCartLoaded(true); // ✅ Mark cart as loaded
     };
 
     loadCart();
-  }, [user]);
+  }, [user, loading]);
 
-  // Sync cart to sessionStorage if not logged in
+  // Save to sessionStorage for guest users
   useEffect(() => {
     if (!user) {
       sessionStorage.setItem('cart', JSON.stringify(cart));
     }
   }, [cart, user]);
 
-  // Sync to MongoDB when cart or user changes
+  // Sync to MongoDB only after cart is loaded
   useEffect(() => {
     const syncWithMongo = async () => {
-      if (!user) return;
+      if (!user?.['_id'] || !cartLoaded) return;
 
       try {
         await fetch('/api/cart', {
           method: 'DELETE',
-          headers: { 'user-id': user._id },
+          headers: {
+            'user-id': user._id,
+            'user-role': user.role,
+            'user-country': user.country,
+          },
         });
 
         for (const item of cart) {
@@ -53,9 +77,11 @@ export function CartProvider({ children }) {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'user-id': user._id
+              'user-id': user._id,
+              'user-role': user.role,
+              'user-country': user.country,
             },
-            body: JSON.stringify({ ...item, userId: user._id }),
+            body: JSON.stringify(item),
           });
         }
       } catch (err) {
@@ -63,59 +89,69 @@ export function CartProvider({ children }) {
       }
     };
 
-    if (user) {
-      syncWithMongo();
-    }
-  }, [cart, user]);
+    syncWithMongo();
+  }, [cart, user, cartLoaded]); // ✅ Only run if cart is fully loaded
 
-  // Add item to cart
-  const addToCart = useCallback((item, restaurantId) => {
+  // Helper to get current restaurant ID
+  const getCartRestaurantId = useCallback(() => {
+    return cart[0]?.restaurantId ?? null;
+  }, [cart]);
+
+  const addToCart = useCallback((item) => {
     setCart((prev) => {
-      if (prev.length > 0 && prev[0].restaurantId !== restaurantId) {
-        alert("You can only order from one restaurant at a time.");
+      // Check restaurant ID match
+      const currentRestaurantId = getCartRestaurantId();
+      if (currentRestaurantId && currentRestaurantId !== item.restaurantId) {
+        alert('You can only order from one restaurant at a time.');
         return prev;
       }
 
-      const existingItem = prev.find(i => i.id === item.id);
+      const existingItem = prev.find((i) => i.id === item.id || i._id === item.id);
       if (existingItem) {
-        return prev.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        return prev.map((i) =>
+          (i.id === item.id || i._id === item.id)
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
         );
-      } else {
-        return [...prev, { ...item, restaurantId, quantity: 1 }];
       }
+      return [...prev, { ...item, quantity: 1 }];
     });
-  }, []);
+  }, [getCartRestaurantId]);
 
   const incrementQuantity = useCallback((itemId) => {
-    setCart(prev =>
-      prev.map(item =>
+    setCart((prev) =>
+      prev.map((item) =>
         item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
       )
     );
   }, []);
 
   const decrementQuantity = useCallback((itemId) => {
-    setCart(prev =>
+    setCart((prev) =>
       prev
-        .map(item =>
+        .map((item) =>
           item.id === itemId ? { ...item, quantity: item.quantity - 1 } : item
         )
-        .filter(item => item.quantity > 0)
+        .filter((item) => item.quantity > 0)
     );
   }, []);
 
   const removeFromCart = useCallback((itemId) => {
-    setCart(prev => prev.filter(item => item.id !== itemId));
+    setCart((prev) => prev.filter((item) => item.id !== itemId));
   }, []);
 
   const clearCart = useCallback(() => {
-    if (confirm("Are you sure you want to clear the cart?")) {
+    if (confirm('Are you sure you want to clear the cart?')) {
       setCart([]);
-      if (user) {
+
+      if (user?.['_id']) {
         fetch('/api/cart', {
           method: 'DELETE',
-          headers: { 'user-id': user._id }
+          headers: {
+            'user-id': user._id,
+            'user-role': user.role,
+            'user-country': user.country,
+          },
         }).catch(console.error);
       } else {
         sessionStorage.removeItem('cart');
@@ -142,7 +178,7 @@ export function CartProvider({ children }) {
         decrementQuantity,
         removeFromCart,
         clearCart,
-        total
+        total,
       }}
     >
       {children}
