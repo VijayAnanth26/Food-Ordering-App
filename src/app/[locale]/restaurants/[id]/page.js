@@ -12,30 +12,45 @@ export default function RestaurantMenuPage() {
   const { id } = useParams();
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [restaurantName, setRestaurantName] = useState('');
+  const [restaurant, setRestaurant] = useState(null);
   const { addToCart } = useCart();
 
   useEffect(() => {
-    const fetchMenuItems = async () => {
+    const fetchRestaurantData = async () => {
       if (!id) return;
       setLoading(true);
       try {
+        // Fetch both restaurant details and menu items in one request
         const res = await fetch(`/api/restaurants/${id}/menu`);
-        if (!res.ok) throw new Error('Failed to fetch menu');
+        if (!res.ok) throw new Error('Failed to fetch restaurant data');
+        
         const data = await res.json();
+        setRestaurant(data.restaurant);
         setMenuItems(data.menuItems || []);
-        setRestaurantName(data.restaurantName || 'Restaurant');
       } catch (err) {
         console.error(err);
         setMenuItems([]);
-        setRestaurantName('Restaurant');
+        setRestaurant(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMenuItems();
+    fetchRestaurantData();
   }, [id]);
+
+  const handleAddToCart = (item) => {
+    if (!restaurant) return;
+    
+    // Add restaurant details to the item
+    const itemWithRestaurant = {
+      ...item,
+      restaurantId: restaurant.id || restaurant._id,
+      restaurantName: restaurant.name,
+    };
+    
+    addToCart(itemWithRestaurant);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white pt-8">
@@ -48,7 +63,7 @@ export default function RestaurantMenuPage() {
         </Link>
 
         <h1 className="text-4xl font-extrabold text-center text-orange-600 mb-12 drop-shadow">
-          {restaurantName}
+          {restaurant?.name || 'Restaurant Menu'}
         </h1>
 
         {loading ? (
@@ -88,14 +103,14 @@ export default function RestaurantMenuPage() {
                 }}
               >
                 <div className="relative w-full h-52 rounded-t-2xl overflow-hidden">
-  <Image
-    src={item.image}
-    alt={item.name}
-    fill
-    className="object-cover"
-    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
-  />
-</div>
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                  />
+                </div>
 
                 <div className="p-5">
                   <h2 className="text-2xl font-semibold text-orange-800 mb-1">
@@ -109,7 +124,7 @@ export default function RestaurantMenuPage() {
                   </span>
                   <button
                     className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-5 py-2 rounded-full transition-all duration-300"
-                    onClick={() => addToCart(item, id)}
+                    onClick={() => handleAddToCart(item)}
                   >
                     <ShoppingCart className="w-4 h-4" />
                     Add to Cart

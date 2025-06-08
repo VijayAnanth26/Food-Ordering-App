@@ -37,7 +37,7 @@ export async function POST(req) {
 
   try {
     const body = await req.json();
-    const { userId, items, total, paymentMethod } = body;
+    const { userId, items, total, paymentMethod, restaurantDetails } = body;
 
     if (!userId || !items || !total) {
       return NextResponse.json({ error: "Missing order details" }, { status: 400 });
@@ -46,6 +46,11 @@ export async function POST(req) {
     const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
+    // Extract restaurant info from the first item if available
+    const restaurantName = items[0]?.restaurantName || null;
+    const restaurantId = items[0]?.restaurantId || null;
+
+    // Create order object with basic details
     const order = {
       items,
       total,
@@ -56,13 +61,31 @@ export async function POST(req) {
       userEmail: user.email,
       userRole: user.role,
       userCountry: user.country,
+      restaurantName,
+      restaurantId
     };
+
+    // Add restaurant details if available
+    if (restaurantDetails) {
+      // Only include essential restaurant information to keep the order document size reasonable
+      order.restaurantDetails = {
+        name: restaurantDetails.name,
+        cuisine: restaurantDetails.cuisine,
+        city: restaurantDetails.city,
+        address: restaurantDetails.address,
+        image: restaurantDetails.image,
+      };
+    }
 
     const result = await db.collection("orders").insertOne(order);
 
     await db.collection("cart").deleteMany({ userId });
 
-    return NextResponse.json({ success: true, orderId: result.insertedId });
+    return NextResponse.json({ 
+      success: true, 
+      _id: result.insertedId,
+      orderId: result.insertedId 
+    });
   } catch (error) {
     console.error("ORDER API POST ERROR:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

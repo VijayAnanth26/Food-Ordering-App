@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { usePayment } from '@/context/PaymentContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useMemo } from 'react';
+import Image from 'next/image';
 
 export default function CartPage() {
   const { cart, removeFromCart, incrementQuantity, decrementQuantity, clearCart, total } = useCart();
@@ -14,11 +15,31 @@ export default function CartPage() {
   const { paymentMethods, selectedMethod, setSelectedMethod } = usePayment();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [restaurant, setRestaurant] = useState(null);
 
   const canPlaceOrder = useMemo(() => {
     const role = user?.role?.toLowerCase();
     return role === 'admin' || role === 'manager';
   }, [user]);
+  
+  // Fetch restaurant details when cart has items
+  useEffect(() => {
+    const fetchRestaurantDetails = async () => {
+      if (cart.length > 0 && cart[0].restaurantId) {
+        try {
+          const res = await fetch(`/api/restaurants/${cart[0].restaurantId}/menu?type=restaurant_only`);
+          if (res.ok) {
+            const data = await res.json();
+            setRestaurant(data);
+          }
+        } catch (error) {
+          console.error('Error fetching restaurant details:', error);
+        }
+      }
+    };
+
+    fetchRestaurantDetails();
+  }, [cart]);
 
   const handlePlaceOrder = async () => {
     if (!selectedMethod) {
@@ -39,6 +60,9 @@ export default function CartPage() {
           items: cart,
           paymentMethod: selectedMethod,
           total,
+          restaurantId: cart[0]?.restaurantId,
+          restaurantName: cart[0]?.restaurantName,
+          restaurantDetails: restaurant
         }),
       });
 
@@ -62,10 +86,37 @@ export default function CartPage() {
       <div className="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-2xl shadow-xl transition-all duration-300">
         <h1 className="text-4xl font-bold text-orange-700 mb-6 text-center">Your Cart</h1>
 
-        {cart.length > 0 && (
-          <p className="text-center text-gray-600 mb-6">
-            Ordering from: <span className="font-semibold text-gray-800">{cart[0].restaurantName}</span>
-          </p>
+        {cart.length > 0 && restaurant && (
+          <div className="text-center mb-8 p-4 bg-orange-50 rounded-lg">
+            <div className="flex flex-col items-center">
+              {restaurant.image && (
+                <div className="relative w-24 h-24 mb-3 overflow-hidden rounded-full">
+                  <Image
+                    src={restaurant.image}
+                    alt={restaurant.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <h2 className="text-xl font-bold text-orange-700">{restaurant.name}</h2>
+              <div className="flex flex-wrap justify-center gap-2 mt-2">
+                {restaurant.cuisine && (
+                  <span className="text-sm bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                    {restaurant.cuisine}
+                  </span>
+                )}
+                {restaurant.city && (
+                  <span className="text-sm bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                    {restaurant.city}
+                  </span>
+                )}
+              </div>
+              {restaurant.address && (
+                <p className="text-sm text-gray-600 mt-2">{restaurant.address}</p>
+              )}
+            </div>
+          </div>
         )}
 
         {cart.length === 0 ? (

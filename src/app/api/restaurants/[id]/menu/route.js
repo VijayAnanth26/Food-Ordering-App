@@ -1,5 +1,6 @@
 import clientPromise from '@/utils/mongodb';
 import { ObjectId } from 'mongodb';
+import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   const restaurantId = await params.id;
@@ -12,7 +13,20 @@ export async function GET(request, { params }) {
 
     const restaurant = await db.collection('restaurants').findOne({ _id: objectId });
     if (!restaurant) {
-      return new Response(JSON.stringify({ message: 'Restaurant not found' }), { status: 404 });
+      return NextResponse.json({ message: 'Restaurant not found' }, { status: 404 });
+    }
+
+    // Format restaurant details for frontend
+    const formattedRestaurant = {
+      ...restaurant,
+      id: restaurant._id.toString(),
+      _id: restaurant._id.toString(),
+    };
+
+    // Check if this is a request just for restaurant info
+    const requestType = request.nextUrl.searchParams.get('type');
+    if (requestType === 'restaurant_only') {
+      return NextResponse.json(formattedRestaurant);
     }
 
     // Assuming menuItems.restaurantId is stored as ObjectId
@@ -23,15 +37,17 @@ export async function GET(request, { params }) {
     const mapped = menuItems.map(item => ({
       ...item,
       id: item._id.toString(),
-      _id: undefined, // optional: remove _id if not needed
+      _id: item._id.toString(), // Keep _id as string for consistency
     }));
 
-    return new Response(JSON.stringify({
+    return NextResponse.json({
+      restaurant: formattedRestaurant,
       restaurantName: restaurant.name,
       menuItems: mapped
-    }), { status: 200 });
+    });
 
   } catch (error) {
-    return new Response(JSON.stringify({ message: 'Server error' }), { status: 500 });
+    console.error('Error fetching restaurant data:', error);
+    return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }

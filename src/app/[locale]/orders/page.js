@@ -4,12 +4,14 @@ import { useOrders } from '@/context/OrdersContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 
 export default function OrdersPage() {
   const { orders, setOrders, updateOrderStatus } = useOrders();
   const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [restaurantDetails, setRestaurantDetails] = useState({});
 
   useEffect(() => {
     if (!user) {
@@ -39,6 +41,40 @@ export default function OrdersPage() {
     }
     if (user) fetchOrders();
   }, [user, setOrders]);
+
+  // Fetch restaurant details for orders
+  useEffect(() => {
+    async function fetchRestaurantDetails() {
+      const restaurantIds = new Set();
+      
+      // Collect unique restaurant IDs
+      orders.forEach(order => {
+        if (order.restaurantId) {
+          restaurantIds.add(order.restaurantId);
+        }
+      });
+      
+      // Fetch details for each restaurant
+      const details = {};
+      await Promise.all([...restaurantIds].map(async (id) => {
+        try {
+          const res = await fetch(`/api/restaurants/${id}/menu?type=restaurant_only`);
+          if (res.ok) {
+            const data = await res.json();
+            details[id] = data;
+          }
+        } catch (error) {
+          console.error(`Error fetching restaurant ${id}:`, error);
+        }
+      }));
+      
+      setRestaurantDetails(details);
+    }
+    
+    if (orders.length > 0) {
+      fetchRestaurantDetails();
+    }
+  }, [orders]);
 
   const filteredOrders = useMemo(() => {
     if (!user) return [];
@@ -97,62 +133,101 @@ export default function OrdersPage() {
           <p className="text-gray-500 text-center">No orders found.</p>
         ) : (
           <div className="space-y-6">
-            {filteredOrders.map((order) => (
-              <div key={order._id} className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="text-xs text-gray-400">Order ID: {order._id}</p>
-                    <p className="text-xs text-gray-400">Date: {new Date(order.createdAt).toLocaleString()}</p>
+            {filteredOrders.map((order) => {
+              const restaurant = restaurantDetails[order.restaurantId] || null;
+              return (
+                <div key={order._id} className="bg-white rounded-lg shadow-md p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <p className="text-xs text-gray-400">Order ID: {order._id}</p>
+                      <p className="text-xs text-gray-400">Date: {new Date(order.createdAt).toLocaleString()}</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      order.status?.toLowerCase() === 'ordered'
+                        ? 'bg-green-100 text-green-800'
+                        : order.status?.toLowerCase() === 'cancelled'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {order.status?.charAt(0).toUpperCase() + order.status?.slice(1).toLowerCase()}
+                    </span>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    order.status?.toLowerCase() === 'ordered'
-                      ? 'bg-green-100 text-green-800'
-                      : order.status?.toLowerCase() === 'cancelled'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {order.status?.charAt(0).toUpperCase() + order.status?.slice(1).toLowerCase()}
-                  </span>
-                </div>
 
-                <div className="text-sm text-gray-700 space-y-1 mb-4">
-                  <p><span className="font-medium">User:</span> {order.userEmail}</p>
-                  <p><span className="font-medium">Role:</span> {order.userRole}</p>
-                  <p><span className="font-medium">Country:</span> {order.userCountry}</p>
-                  <p><span className="font-medium">Payment:</span> {order.paymentMethod?.name || "N/A"}</p>
-                </div>
-
-                <div className="border-t pt-4">
-                  <h3 className="font-semibold text-gray-800 mb-2">Items:</h3>
-                  {order.items && order.items.length > 0 ? (
-                    <ul className="space-y-1 text-sm">
-                      {order.items.map((item, index) => (
-                        <li key={`${order._id}-${index}`} className="flex justify-between text-gray-700">
-                          <span>{item.name} × {item.quantity || 1}</span>
-                          <span>₹{item.price * (item.quantity || 1)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-sm text-gray-500">No items in this order.</p>
+                  {/* Restaurant Details */}
+                  {restaurant && (
+                    <div className="mb-4 p-4 bg-orange-50 rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        {restaurant.image && (
+                          <div className="relative w-16 h-16 overflow-hidden rounded-lg flex-shrink-0">
+                            <Image
+                              src={restaurant.image}
+                              alt={restaurant.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <h3 className="font-bold text-orange-700">{restaurant.name}</h3>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {restaurant.cuisine && (
+                              <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                                {restaurant.cuisine}
+                              </span>
+                            )}
+                            {restaurant.city && (
+                              <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                                {restaurant.city}
+                              </span>
+                            )}
+                          </div>
+                          {restaurant.address && (
+                            <p className="text-xs text-gray-600 mt-1">{restaurant.address}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   )}
-                  <p className="text-right text-lg font-bold text-orange-700 mt-4">
-                    Total: ₹{order.total}
-                  </p>
-                </div>
 
-                {canCancelOrder && order.status?.toLowerCase() === 'ordered' && (
-                  <div className="mt-4 pt-4 border-t">
-                    <button
-                      onClick={() => handleCancelOrder(order._id)}
-                      className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors text-sm font-medium"
-                    >
-                      Cancel Order
-                    </button>
+                  <div className="text-sm text-gray-700 space-y-1 mb-4">
+                    <p><span className="font-medium">User:</span> {order.userEmail}</p>
+                    <p><span className="font-medium">Role:</span> {order.userRole}</p>
+                    <p><span className="font-medium">Country:</span> {order.userCountry}</p>
+                    <p><span className="font-medium">Payment:</span> {order.paymentMethod?.name || "N/A"}</p>
                   </div>
-                )}
-              </div>
-            ))}
+
+                  <div className="border-t pt-4">
+                    <h3 className="font-semibold text-gray-800 mb-2">Items:</h3>
+                    {order.items && order.items.length > 0 ? (
+                      <ul className="space-y-1 text-sm">
+                        {order.items.map((item, index) => (
+                          <li key={`${order._id}-${index}`} className="flex justify-between text-gray-700">
+                            <span>{item.name} × {item.quantity || 1}</span>
+                            <span>₹{item.price * (item.quantity || 1)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-gray-500">No items in this order.</p>
+                    )}
+                    <p className="text-right text-lg font-bold text-orange-700 mt-4">
+                      Total: ₹{order.total}
+                    </p>
+                  </div>
+
+                  {canCancelOrder && order.status?.toLowerCase() === 'ordered' && (
+                    <div className="mt-4 pt-4 border-t">
+                      <button
+                        onClick={() => handleCancelOrder(order._id)}
+                        className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors text-sm font-medium"
+                      >
+                        Cancel Order
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
