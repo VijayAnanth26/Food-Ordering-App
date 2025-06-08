@@ -4,6 +4,41 @@
     "browseRestaurants": "Explorar Restaurantes",
     "loading": "Cargando...",
     "noRestaurants": "No hay restaurantes disponibles en tu región",
+    "footer": {
+      "copyright": "© {year} Nick Fury Enterprises. Todos los derechos reservados.",
+      "about": "Acerca de",
+      "privacy": "Privacidad",
+      "terms": "Términos",
+      "contact": "Contacto"
+    },
+    "auth": {
+      "required": "Autenticación Requerida",
+      "loginNeeded": "Debes iniciar sesión para ver esta página. Por favor, inicia sesión para continuar.",
+      "goToLogin": "Ir a Iniciar Sesión"
+    },
+    "login": {
+      "title": "Iniciar Sesión en Fury Foods",
+      "error": "Error al iniciar sesión. Por favor, inténtalo de nuevo.",
+      "loadError": "Error al cargar usuarios. Por favor, inténtalo más tarde.",
+      "email": "Correo Electrónico",
+      "selectEmail": "Selecciona Correo Electrónico",
+      "role": "Rol",
+      "selectRole": "Selecciona Rol",
+      "country": "País",
+      "selectCountry": "Selecciona País",
+      "loginButton": "Iniciar Sesión",
+      "newUser": "¿Nuevo en Fury Foods?",
+      "askNick": "Pregunta a Nick Fury"
+    },
+    "navbar": {
+      "home": "Inicio",
+      "restaurants": "Restaurantes",
+      "orders": "Pedidos",
+      "cart": "Carrito",
+      "dashboard": "Panel de Control",
+      "login": "Iniciar Sesión",
+      "logout": "Cerrar Sesión"
+    },
     "orders": {
       "title": "Tus Pedidos",
       "role": "Rol",
@@ -14,7 +49,82 @@
         "ordered": "Pedido",
         "cancelled": "Cancelado"
       },
-      "noOrders": "No se encontraron pedidos"
+      "noOrders": "No se encontraron pedidos",
+      "user": "Usuario",
+      "payment": "Pago",
+      "items": "Artículos",
+      "total": "Total",
+      "cancelOrder": "Cancelar Pedido",
+      "confirmCancel": "¿Estás seguro de que quieres cancelar este pedido?",
+      "cancelSuccess": "Pedido cancelado con éxito",
+      "cancelError": "Error al cancelar el pedido. Inténtalo de nuevo.",
+      "onlyAdminCancel": "Solo los Administradores y Gerentes pueden cancelar pedidos."
+    },
+    "cart": {
+      "title": "Tu Carrito",
+      "empty": "Tu carrito está vacío.",
+      "orderingFrom": "Ordenando de",
+      "price": "Precio",
+      "quantity": "Cantidad",
+      "remove": "Eliminar",
+      "paymentMethod": "Método de Pago",
+      "selectPayment": "Selecciona método de pago",
+      "total": "Total",
+      "estimatedDelivery": "Entrega estimada: 30–45 minutos",
+      "noPermission": "No tienes permiso para realizar pedidos. Solo los Administradores y Gerentes pueden realizar esta acción.",
+      "placeOrder": "Realizar Pedido",
+      "placingOrder": "Procesando Pedido...",
+      "orderSuccess": "¡Pedido realizado con éxito!",
+      "orderError": "Error al realizar el pedido. Inténtalo de nuevo.",
+      "selectPaymentPrompt": "Por favor selecciona un método de pago."
+    },
+    "restaurant": {
+      "menu": "Menú del Restaurante",
+      "backToRestaurants": "Volver a Restaurantes",
+      "noItems": "No hay artículos disponibles para este restaurante.",
+      "addToCart": "Añadir al Carrito",
+      "description": "Delicioso y recién preparado."
+    },
+    "dashboard": {
+      "title": "Bienvenido al Panel de Control",
+      "loggedInAs": "Conectado como:",
+      "viewRestaurants": {
+        "title": "Ver Restaurantes y Menú",
+        "description": "Explora restaurantes y sus menús.",
+        "button": "Ver Restaurantes"
+      },
+      "createOrder": {
+        "title": "Crear Pedido",
+        "description": "Añadir alimentos a tu carrito.",
+        "button": "Añadir Artículos"
+      },
+      "placeOrder": {
+        "title": "Realizar Pedido",
+        "description": "Procede a realizar tu pedido.",
+        "button": "Realizar Pedido",
+        "notAllowed": "No Permitido"
+      },
+      "cancelOrder": {
+        "title": "Cancelar Pedido",
+        "description": "Cancela un pedido realizado.",
+        "button": "Cancelar Pedido",
+        "notAllowed": "No Permitido"
+      },
+      "paymentMethods": {
+        "title": "Modificar Métodos de Pago",
+        "description": "Añadir, editar o eliminar métodos de pago disponibles.",
+        "button": "Gestionar Pagos",
+        "notAllowed": "No Permitido"
+      }
+    },
+    "paymentMethods": {
+      "title": "Gestionar Métodos de Pago",
+      "loading": "Cargando...",
+      "accessDenied": "Acceso denegado: Solo los Administradores pueden gestionar los métodos de pago.",
+      "noMethods": "No hay métodos de pago disponibles.",
+      "deleteButton": "Eliminar",
+      "addPlaceholder": "Nuevo método de pago",
+      "addButton": "Añadir"
     }
   }
 } 

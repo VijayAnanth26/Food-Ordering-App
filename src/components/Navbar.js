@@ -1,10 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useState, useRef, useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, Link } from '@/i18n/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import {
   HomeIcon,
@@ -18,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function Navbar() {
+  const t = useTranslations('common.navbar');
   const { user, logout } = useAuth();
   const { cart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,6 +26,7 @@ export default function Navbar() {
   const userMenuRef = useRef(null);
   const pathname = usePathname();
   const router = useRouter();
+  const locale = useLocale();
 
   // Calculate total items in cart
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -58,25 +60,25 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-6">
             <Link href="/" className={navLinkClass('/')}>
               <HomeIcon className="w-5 h-5" />
-              Home
+              {t('home')}
             </Link>
             <Link href="/restaurants" className={navLinkClass('/restaurants')}>
               <BuildingStorefrontIcon className="w-5 h-5" />
-              Restaurants
+              {t('restaurants')}
             </Link>
             <Link href="/orders" className={navLinkClass('/orders')}>
               <ClipboardDocumentListIcon className="w-5 h-5" />
-              Orders
+              {t('orders')}
             </Link>
 
             {/* Cart */}
             {user && (
               <button
-                onClick={() => router.push('/cart')}
+                onClick={() => router.push('/cart', { locale })}
                 className="relative flex items-center gap-1 hover:text-orange-200 focus:outline-none"
               >
                 <ShoppingCartIcon className="w-6 h-6" />
-                <span>Cart ({totalItems})</span>
+                <span>{t('cart')} ({totalItems})</span>
               </button>
             )}
 
@@ -114,7 +116,7 @@ export default function Navbar() {
                       onClick={() => setUserMenuOpen(false)}
                     >
                       <Squares2X2Icon className="w-5 h-5" />
-                      Dashboard
+                      {t('dashboard')}
                     </Link>
                     <button
                       onClick={() => {
@@ -124,7 +126,7 @@ export default function Navbar() {
                       className="w-full text-left flex items-center gap-2 px-4 py-2 hover:bg-orange-100 hover:text-orange-600"
                     >
                       <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                      Logout
+                      {t('logout')}
                     </button>
                   </div>
                 )}
@@ -135,7 +137,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 bg-white text-orange-500 px-4 py-1 rounded hover:bg-orange-100 hover:text-orange-700 font-semibold"
               >
                 <ArrowLeftOnRectangleIcon className="w-5 h-5" />
-                Login
+                {t('login')}
               </Link>
             )}
           </div>
@@ -169,28 +171,28 @@ export default function Navbar() {
 
           <Link href="/" onClick={() => setMenuOpen(false)} className={navLinkClass('/')}>
             <HomeIcon className="w-5 h-5" />
-            Home
+            {t('home')}
           </Link>
           <Link href="/restaurants" onClick={() => setMenuOpen(false)} className={navLinkClass('/restaurants')}>
             <BuildingStorefrontIcon className="w-5 h-5" />
-            Restaurants
+            {t('restaurants')}
           </Link>
           <Link href="/orders" onClick={() => setMenuOpen(false)} className={navLinkClass('/orders')}>
             <ClipboardDocumentListIcon className="w-5 h-5" />
-            Orders
+            {t('orders')}
           </Link>
 
           {user && (
             <>
               <button
                 onClick={() => {
-                  router.push('/cart');
+                  router.push('/cart', { locale });
                   setMenuOpen(false);
                 }}
                 className="flex items-center gap-2 bg-orange-700 px-3 py-2 rounded hover:bg-orange-800"
               >
                 <ShoppingCartIcon className="w-5 h-5" />
-                Cart ({totalItems})
+                {t('cart')} ({totalItems})
               </button>
               <Link
                 href="/dashboard"
@@ -198,34 +200,30 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(false)}
               >
                 <Squares2X2Icon className="w-5 h-5" />
-                Dashboard
+                {t('dashboard')}
               </Link>
-              <div className="border-t border-orange-500 pt-2">
-                <p className="text-sm">{user.email}</p>
-                <p className="text-xs italic mb-2">{user.role.toUpperCase()}</p>
-                {user.country && <p className="text-xs italic mb-2">{user.country}</p>}
-                <button
-                  onClick={() => {
-                    logout();
-                    setMenuOpen(false);
-                  }}
-                  className="w-full flex items-center justify-center gap-2 bg-white text-orange-600 px-3 py-1 rounded hover:bg-orange-100"
-                >
-                  <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                  Logout
-                </button>
-              </div>
             </>
           )}
 
-          {!user && (
+          {user ? (
+            <button
+              onClick={() => {
+                logout();
+                setMenuOpen(false);
+              }}
+              className="flex w-full items-center gap-2 bg-white text-orange-600 px-3 py-2 rounded"
+            >
+              <ArrowRightOnRectangleIcon className="w-5 h-5" />
+              {t('logout')}
+            </button>
+          ) : (
             <Link
               href="/login"
-              className="flex items-center gap-2 bg-white text-orange-500 px-3 py-1 rounded justify-center hover:bg-orange-100"
+              className="flex items-center gap-2 bg-white text-orange-600 px-3 py-2 rounded"
               onClick={() => setMenuOpen(false)}
             >
               <ArrowLeftOnRectangleIcon className="w-5 h-5" />
-              Login
+              {t('login')}
             </Link>
           )}
         </div>

@@ -3,8 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export default function LoginPage() {
+  const t = useTranslations('common.login');
+  const tCommon = useTranslations('common');
   const { login } = useAuth();
 
   const [users, setUsers] = useState([]);
@@ -28,13 +31,13 @@ export default function LoginPage() {
         setUsers(data);
       } catch (err) {
         console.error('Failed to fetch users:', err);
-        setError('Failed to load users. Please try again later.');
+        setError(t('loadError'));
       } finally {
         setLoading(false);
       }
     };
     fetchUsers();
-  }, []);
+  }, [t]);
 
   // When email changes, autofill role and country
   const handleEmailChange = (e) => {
@@ -59,7 +62,7 @@ export default function LoginPage() {
       await login(email, role, country);
     } catch (err) {
       console.error('Login failed:', err);
-      setError('Login failed. Please try again.');
+      setError(t('error'));
     }
   };
 
@@ -74,9 +77,10 @@ export default function LoginPage() {
               fill
               style={{ objectFit: 'contain' }}
               priority
+              sizes="3rem"
             />
           </div>
-          <h2 className="text-3xl font-extrabold text-orange-600 mb-2">Login to Fury Foods</h2>
+          <h2 className="text-3xl font-extrabold text-orange-600 mb-2">{t('title')}</h2>
         </div>
 
         {error && (
@@ -88,7 +92,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email Dropdown */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
             <select
               value={email}
               onChange={handleEmailChange}
@@ -98,7 +102,7 @@ export default function LoginPage() {
                 loading ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              <option value="">Select Dummy Email</option>
+              <option value="">{t('selectEmail')}</option>
               {users.map(({ email }) => (
                 <option key={email} value={email}>
                   {email}
@@ -109,7 +113,7 @@ export default function LoginPage() {
 
           {/* Role */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('role')}</label>
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
@@ -117,14 +121,14 @@ export default function LoginPage() {
               disabled
               className="w-full border rounded-md p-2 bg-gray-100 cursor-not-allowed"
             >
-              <option value="">Select Role</option>
+              <option value="">{t('selectRole')}</option>
               {role && <option value={role}>{role}</option>}
             </select>
           </div>
 
           {/* Country */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('country')}</label>
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
@@ -132,7 +136,7 @@ export default function LoginPage() {
               disabled
               className="w-full border rounded-md p-2 bg-gray-100 cursor-not-allowed"
             >
-              <option value="">Select Country</option>
+              <option value="">{t('selectCountry')}</option>
               {country && <option value={country}>{country}</option>}
             </select>
           </div>
@@ -146,13 +150,13 @@ export default function LoginPage() {
                 (!email || loading) ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              {loading ? 'Loading...' : 'Login'}
+              {loading ? tCommon('loading') : t('loginButton')}
             </button>
           </div>
         </form>
 
         <p className="text-center text-sm text-gray-500">
-          New to Fury Foods? <span className="text-orange-600 font-medium">Ask Nick Fury</span>
+          {t('newUser')} <span className="text-orange-600 font-medium">{t('askNick')}</span>
         </p>
       </div>
     </div>

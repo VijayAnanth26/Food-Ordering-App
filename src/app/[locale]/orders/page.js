@@ -5,8 +5,12 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 export default function OrdersPage() {
+  const t = useTranslations('common.orders');
+  const locale = useLocale();
   const { orders, setOrders, updateOrderStatus } = useOrders();
   const { user } = useAuth();
   const router = useRouter();
@@ -15,9 +19,9 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (!user) {
-      router.push('/login');
+      router.push(`/${locale}/login`);
     }
-  }, [user, router]);
+  }, [user, router, locale]);
 
   useEffect(() => {
     async function fetchOrders() {
@@ -90,11 +94,11 @@ export default function OrdersPage() {
 
   const handleCancelOrder = async (orderId) => {
     if (!canCancelOrder) {
-      alert('Only Admin and Managers can cancel orders.');
+      alert(t('onlyAdminCancel'));
       return;
     }
   
-    if (window.confirm('Are you sure you want to cancel this order?')) {
+    if (window.confirm(t('confirmCancel'))) {
       try {
         const res = await fetch(`/api/orders/${orderId}/cancel`, {
           method: 'PUT',
@@ -107,7 +111,7 @@ export default function OrdersPage() {
         updateOrderStatus(orderId, 'Cancelled');
       } catch (error) {
         console.error('Error cancelling order:', error);
-        alert('Failed to cancel order. Please try again.');
+        alert(t('cancelError'));
       }
     }
   };
@@ -118,11 +122,11 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white p-8">
       <div className="max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-orange-700">Your Orders</h1>
+          <h1 className="text-3xl font-bold text-orange-700">{t('title')}</h1>
           <div className="text-sm text-gray-600 text-right">
-            <div><span className="font-medium">Role:</span> {user.role}</div>
+            <div><span className="font-medium">{t('role')}:</span> {user.role}</div>
             {user.country && (
-              <div><span className="font-medium">Country:</span> {user.country}</div>
+              <div><span className="font-medium">{t('country')}:</span> {user.country}</div>
             )}
           </div>
         </div>
@@ -130,7 +134,7 @@ export default function OrdersPage() {
         {loading ? (
           <p className="text-center text-gray-500">Loading orders...</p>
         ) : filteredOrders.length === 0 ? (
-          <p className="text-gray-500 text-center">No orders found.</p>
+          <p className="text-gray-500 text-center">{t('noOrders')}</p>
         ) : (
           <div className="space-y-6">
             {filteredOrders.map((order) => {
@@ -139,8 +143,8 @@ export default function OrdersPage() {
                 <div key={order._id} className="bg-white rounded-lg shadow-md p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <p className="text-xs text-gray-400">Order ID: {order._id}</p>
-                      <p className="text-xs text-gray-400">Date: {new Date(order.createdAt).toLocaleString()}</p>
+                      <p className="text-xs text-gray-400">{t('orderId')}: {order._id}</p>
+                      <p className="text-xs text-gray-400">{t('date')}: {new Date(order.createdAt).toLocaleString(locale)}</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       order.status?.toLowerCase() === 'ordered'
@@ -149,7 +153,8 @@ export default function OrdersPage() {
                         ? 'bg-red-100 text-red-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {order.status?.charAt(0).toUpperCase() + order.status?.slice(1).toLowerCase()}
+                      {order.status?.toLowerCase() === 'ordered' ? t('status.ordered') : 
+                       order.status?.toLowerCase() === 'cancelled' ? t('status.cancelled') : order.status}
                     </span>
                   </div>
 
@@ -164,6 +169,7 @@ export default function OrdersPage() {
                               alt={restaurant.name}
                               fill
                               className="object-cover"
+                              sizes="4rem"
                             />
                           </div>
                         )}
@@ -190,14 +196,14 @@ export default function OrdersPage() {
                   )}
 
                   <div className="text-sm text-gray-700 space-y-1 mb-4">
-                    <p><span className="font-medium">User:</span> {order.userEmail}</p>
-                    <p><span className="font-medium">Role:</span> {order.userRole}</p>
-                    <p><span className="font-medium">Country:</span> {order.userCountry}</p>
-                    <p><span className="font-medium">Payment:</span> {order.paymentMethod?.name || "N/A"}</p>
+                    <p><span className="font-medium">{t('user')}:</span> {order.userEmail}</p>
+                    <p><span className="font-medium">{t('role')}:</span> {order.userRole}</p>
+                    <p><span className="font-medium">{t('country')}:</span> {order.userCountry}</p>
+                    <p><span className="font-medium">{t('payment')}:</span> {order.paymentMethod?.name || "N/A"}</p>
                   </div>
 
                   <div className="border-t pt-4">
-                    <h3 className="font-semibold text-gray-800 mb-2">Items:</h3>
+                    <h3 className="font-semibold text-gray-800 mb-2">{t('items')}:</h3>
                     {order.items && order.items.length > 0 ? (
                       <ul className="space-y-1 text-sm">
                         {order.items.map((item, index) => (
@@ -211,7 +217,7 @@ export default function OrdersPage() {
                       <p className="text-sm text-gray-500">No items in this order.</p>
                     )}
                     <p className="text-right text-lg font-bold text-orange-700 mt-4">
-                      Total: ₹{order.total}
+                      {t('total')}: ₹{order.total}
                     </p>
                   </div>
 
@@ -221,7 +227,7 @@ export default function OrdersPage() {
                         onClick={() => handleCancelOrder(order._id)}
                         className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors text-sm font-medium"
                       >
-                        Cancel Order
+                        {t('cancelOrder')}
                       </button>
                     </div>
                   )}

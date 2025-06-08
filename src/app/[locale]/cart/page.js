@@ -7,8 +7,12 @@ import { usePayment } from '@/context/PaymentContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 export default function CartPage() {
+  const t = useTranslations('common.cart');
+  const locale = useLocale();
   const { cart, removeFromCart, incrementQuantity, decrementQuantity, clearCart, total } = useCart();
   const { placeOrder } = useOrders();
   const { user } = useAuth();
@@ -43,7 +47,7 @@ export default function CartPage() {
 
   const handlePlaceOrder = async () => {
     if (!selectedMethod) {
-      alert('Please select a payment method.');
+      alert(t('selectPaymentPrompt'));
       return;
     }
 
@@ -69,13 +73,13 @@ export default function CartPage() {
       if (!res.ok) throw new Error('Failed to place order');
 
       const newOrder = await res.json();
-      router.push(`/orders?newOrderId=${newOrder._id}`);
+      router.push(`/${locale}/orders?newOrderId=${newOrder._id}`);
 
       await new Promise((resolve) => setTimeout(resolve, 2000));
       clearCart();
     } catch (error) {
       console.error('Error placing order:', error);
-      alert('Failed to place order. Please try again.');
+      alert(t('orderError'));
     } finally {
       setLoading(false);
     }
@@ -84,7 +88,7 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white p-6 md:p-10">
       <div className="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-2xl shadow-xl transition-all duration-300">
-        <h1 className="text-4xl font-bold text-orange-700 mb-6 text-center">Your Cart</h1>
+        <h1 className="text-4xl font-bold text-orange-700 mb-6 text-center">{t('title')}</h1>
 
         {cart.length > 0 && restaurant && (
           <div className="text-center mb-8 p-4 bg-orange-50 rounded-lg">
@@ -96,6 +100,7 @@ export default function CartPage() {
                     alt={restaurant.name}
                     fill
                     className="object-cover"
+                    sizes="6rem"
                   />
                 </div>
               )}
@@ -120,7 +125,7 @@ export default function CartPage() {
         )}
 
         {cart.length === 0 ? (
-          <p className="text-gray-500 text-center text-lg">Your cart is empty.</p>
+          <p className="text-gray-500 text-center text-lg">{t('empty')}</p>
         ) : (
           <>
             <ul className="space-y-5 mb-8">
@@ -148,14 +153,14 @@ export default function CartPage() {
                     onClick={() => removeFromCart(item.id)}
                     className="text-red-600 hover:underline font-medium text-sm"
                   >
-                    Remove
+                    {t('remove')}
                   </button>
                 </li>
               ))}
             </ul>
 
             <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-2">Payment Method</label>
+              <label className="block text-gray-700 font-medium mb-2">{t('paymentMethod')}</label>
               <select
                 value={selectedMethod?.name || ""}
                 onChange={(e) => {
@@ -164,7 +169,7 @@ export default function CartPage() {
                 }}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
               >
-                <option value="">Select payment method</option>
+                <option value="">{t('selectPayment')}</option>
                 {paymentMethods.map((method) => (
                   <option key={method._id} value={method.name}>
                     {method.name}
@@ -174,15 +179,15 @@ export default function CartPage() {
             </div>
 
             <div className="flex justify-between items-center text-lg font-semibold text-gray-800 mb-4">
-              <span>Total:</span>
+              <span>{t('total')}:</span>
               <span className="text-orange-700 text-xl">₹{total}</span>
             </div>
 
-            <p className="text-sm text-gray-500 mb-6 text-center">Estimated delivery: 30–45 minutes</p>
+            <p className="text-sm text-gray-500 mb-6 text-center">{t('estimatedDelivery')}</p>
 
             {!canPlaceOrder && (
               <p className="text-red-600 text-sm mb-4 text-center">
-                You do not have permission to place orders. Only Admins and Managers can perform this action.
+                {t('noPermission')}
               </p>
             )}
 
@@ -195,7 +200,7 @@ export default function CartPage() {
                   : 'bg-orange-600 hover:bg-orange-700'
               }`}
             >
-              {loading ? 'Placing Order...' : 'Place Order'}
+              {loading ? t('placingOrder') : t('placeOrder')}
             </button>
           </>
         )}

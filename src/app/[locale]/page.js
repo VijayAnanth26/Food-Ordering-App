@@ -1,8 +1,13 @@
 // frontend/src/app/page.js
-import Link from 'next/link';
+'use client';
+
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 export default function Home() {
+  const t = useTranslations('common');
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-orange-50 to-white pt-16 min-h-screen">
       <div className="absolute inset-0 pointer-events-none opacity-10 bg-[url('https://www.toptal.com/designers/subtlepatterns/patterns/symphony.png')]"></div>
@@ -10,7 +15,7 @@ export default function Home() {
         <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
           <div className="sm:max-w-lg">
             <h1 className="text-5xl font-extrabold tracking-tight text-orange-600 sm:text-7xl drop-shadow-lg">
-              Welcome to <span className="text-orange-400">Fury Foods</span>
+              {t('welcome')} <span className="text-orange-400">Fury Foods</span>
             </h1>
             <p className="mt-6 text-2xl text-gray-700">
               A Role & Country based Food Ordering Platform powered by Nick Fury and his team. Discover local restaurants, order meals, and manage your orders — all in one place.
@@ -20,7 +25,7 @@ export default function Home() {
                 href="/restaurants"
                 className="inline-flex items-center rounded-md bg-orange-600 px-8 py-3 text-lg font-semibold text-white shadow-lg hover:bg-orange-700 transition"
               >
-                <span>Browse Restaurants</span>
+                <span>{t('browseRestaurants')}</span>
                 <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>

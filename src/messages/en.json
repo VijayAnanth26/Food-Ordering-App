@@ -4,6 +4,41 @@
     "browseRestaurants": "Browse Restaurants",
     "loading": "Loading...",
     "noRestaurants": "No restaurants available in your region",
+    "footer": {
+      "copyright": "© {year} Nick Fury Enterprises. All rights reserved.",
+      "about": "About",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "contact": "Contact"
+    },
+    "auth": {
+      "required": "Authentication Required",
+      "loginNeeded": "You must be logged in to view this page. Please sign in to continue.",
+      "goToLogin": "Go to Login"
+    },
+    "login": {
+      "title": "Login to Fury Foods",
+      "error": "Login failed. Please try again.",
+      "loadError": "Failed to load users. Please try again later.",
+      "email": "Email",
+      "selectEmail": "Select Dummy Email",
+      "role": "Role",
+      "selectRole": "Select Role",
+      "country": "Country",
+      "selectCountry": "Select Country",
+      "loginButton": "Login",
+      "newUser": "New to Fury Foods?",
+      "askNick": "Ask Nick Fury"
+    },
+    "navbar": {
+      "home": "Home",
+      "restaurants": "Restaurants",
+      "orders": "Orders",
+      "cart": "Cart",
+      "dashboard": "Dashboard",
+      "login": "Login",
+      "logout": "Logout"
+    },
     "orders": {
       "title": "Your Orders",
       "role": "Role",
@@ -14,7 +49,82 @@
         "ordered": "Ordered",
         "cancelled": "Cancelled"
       },
-      "noOrders": "No orders found"
+      "noOrders": "No orders found",
+      "user": "User",
+      "payment": "Payment",
+      "items": "Items",
+      "total": "Total",
+      "cancelOrder": "Cancel Order",
+      "confirmCancel": "Are you sure you want to cancel this order?",
+      "cancelSuccess": "Order cancelled successfully",
+      "cancelError": "Failed to cancel order. Please try again.",
+      "onlyAdminCancel": "Only Admin and Managers can cancel orders."
+    },
+    "cart": {
+      "title": "Your Cart",
+      "empty": "Your cart is empty.",
+      "orderingFrom": "Ordering from",
+      "price": "Price",
+      "quantity": "Quantity",
+      "remove": "Remove",
+      "paymentMethod": "Payment Method",
+      "selectPayment": "Select payment method",
+      "total": "Total",
+      "estimatedDelivery": "Estimated delivery: 30–45 minutes",
+      "noPermission": "You do not have permission to place orders. Only Admins and Managers can perform this action.",
+      "placeOrder": "Place Order",
+      "placingOrder": "Placing Order...",
+      "orderSuccess": "Order placed successfully!",
+      "orderError": "Failed to place order. Please try again.",
+      "selectPaymentPrompt": "Please select a payment method."
+    },
+    "restaurant": {
+      "menu": "Restaurant Menu",
+      "backToRestaurants": "Back to Restaurants",
+      "noItems": "No menu items available for this restaurant.",
+      "addToCart": "Add to Cart",
+      "description": "Delicious and freshly prepared."
+    },
+    "dashboard": {
+      "title": "Welcome to the Dashboard",
+      "loggedInAs": "Logged in as:",
+      "viewRestaurants": {
+        "title": "View Restaurants & Menu",
+        "description": "Explore restaurants and their menus.",
+        "button": "View Restaurants"
+      },
+      "createOrder": {
+        "title": "Create Order",
+        "description": "Add food items to your cart.",
+        "button": "Add Items"
+      },
+      "placeOrder": {
+        "title": "Place Order",
+        "description": "Proceed to place your order.",
+        "button": "Place Order",
+        "notAllowed": "Not Allowed"
+      },
+      "cancelOrder": {
+        "title": "Cancel Order",
+        "description": "Cancel a placed order.",
+        "button": "Cancel Order",
+        "notAllowed": "Not Allowed"
+      },
+      "paymentMethods": {
+        "title": "Modify Payment Methods",
+        "description": "Add, edit, or remove available payment methods.",
+        "button": "Manage Payments",
+        "notAllowed": "Not Allowed"
+      }
+    },
+    "paymentMethods": {
+      "title": "Manage Payment Methods",
+      "loading": "Loading...",
+      "accessDenied": "Access denied: Only Admins can manage payment methods.",
+      "noMethods": "No payment methods available.",
+      "deleteButton": "Delete",
+      "addPlaceholder": "New payment method",
+      "addButton": "Add"
     }
   }
 } 

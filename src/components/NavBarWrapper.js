@@ -1,7 +1,7 @@
 // frontend/src/components/NavBarWrapper.js
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/i18n/navigation';
 import { useLocale } from 'next-intl';
 import Navbar from './Navbar';
 

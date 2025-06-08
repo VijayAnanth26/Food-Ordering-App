@@ -4,11 +4,14 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 export default function RestaurantMenuPage() {
+  const t = useTranslations('common.restaurant');
+  const locale = useLocale();
   const { id } = useParams();
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,11 +62,11 @@ export default function RestaurantMenuPage() {
           href="/restaurants"
           className="text-orange-500 hover:underline text-sm mb-6 inline-block"
         >
-          ← Back to Restaurants
+          {t('backToRestaurants')}
         </Link>
 
         <h1 className="text-4xl font-extrabold text-center text-orange-600 mb-12 drop-shadow">
-          {restaurant?.name || 'Restaurant Menu'}
+          {restaurant?.name || t('menu')}
         </h1>
 
         {loading ? (
@@ -117,7 +120,7 @@ export default function RestaurantMenuPage() {
                     {item.name}
                   </h2>
                   <p className="text-sm text-gray-500 mb-2 line-clamp-2">
-                    {item.description || 'Delicious and freshly prepared.'}
+                    {item.description || t('description')}
                   </p>
                   <span className="inline-block bg-orange-100 text-orange-600 text-sm font-medium px-3 py-1 rounded-full mb-4">
                     ₹{item.price}
@@ -127,7 +130,7 @@ export default function RestaurantMenuPage() {
                     onClick={() => handleAddToCart(item)}
                   >
                     <ShoppingCart className="w-4 h-4" />
-                    Add to Cart
+                    {t('addToCart')}
                   </button>
                 </div>
               </motion.div>
@@ -135,7 +138,7 @@ export default function RestaurantMenuPage() {
           </motion.div>
         ) : (
           <p className="text-center text-gray-500 mt-12">
-            No menu items available for this restaurant.
+            {t('noItems')}
           </p>
         )}
       </div>
