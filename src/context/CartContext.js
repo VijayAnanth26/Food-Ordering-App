@@ -60,7 +60,7 @@ export function CartProvider({ children }) {
   // Sync to MongoDB only after cart is loaded
   useEffect(() => {
     const syncWithMongo = async () => {
-      if (!user?.['_id'] || !cartLoaded) return;
+      if (!user?._id || !cartLoaded) return;
 
       try {
         await fetch('/api/cart', {
@@ -141,21 +141,19 @@ export function CartProvider({ children }) {
   }, []);
 
   const clearCart = useCallback(() => {
-    if (confirm('Are you sure you want to clear the cart?')) {
-      setCart([]);
+    setCart([]);
 
-      if (user?.['_id']) {
-        fetch('/api/cart', {
-          method: 'DELETE',
-          headers: {
-            'user-id': user._id,
-            'user-role': user.role,
-            'user-country': user.country,
-          },
-        }).catch(console.error);
-      } else {
-        sessionStorage.removeItem('cart');
-      }
+    if (user?._id) {
+      fetch('/api/cart', {
+        method: 'DELETE',
+        headers: {
+          'user-id': user._id,
+          'user-role': user.role,
+          'user-country': user.country,
+        },
+      }).catch(console.error);
+    } else {
+      sessionStorage.removeItem('cart');
     }
   }, [user]);
 

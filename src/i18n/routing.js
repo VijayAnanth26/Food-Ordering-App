@@ -9,5 +9,7 @@ export const routing = defineRouting({
   // This makes sure URLs don't have duplicate locale prefixes
   urlMappingStrategy: 'pathname',
   // Only add locale prefix when needed to differentiate from default locale
-  localePrefix: 'as-needed'
+  localePrefix: 'as-needed',
+  // Disable prefetching of locale-specific assets to prevent CSS preload warnings
+  prefetch: false,
 });

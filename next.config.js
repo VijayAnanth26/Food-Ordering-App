@@ -28,6 +28,16 @@ const nextConfig = {
       },
     ],
   },
+  // Optimize the way CSS chunks are loaded to prevent preload warnings
+  optimizeFonts: true,
+  experimental: {
+    // Disables the automatic font optimization to prevent preloading issues
+    optimizeCss: false,
+    // Avoid unnecessary preloads
+    optimisticClientCache: true,
+  },
+  // Disable Next.js from optimizing/preloading CSS files
+  optimizePackageImports: [],
 };
 
 module.exports = withNextIntl(nextConfig); 

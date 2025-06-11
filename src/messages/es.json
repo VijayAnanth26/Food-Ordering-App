@@ -9,12 +9,22 @@
       "about": "Acerca de",
       "privacy": "Privacidad",
       "terms": "Términos",
-      "contact": "Contacto"
+      "contact": "Contacto",
+      "quickLinks": "Enlaces Rápidos",
+      "restaurants": "Restaurantes",
+      "legal": "Legal",
+      "faq": "Preguntas Frecuentes",
+      "allRightsReserved": "Todos los derechos reservados"
     },
     "auth": {
       "required": "Autenticación Requerida",
       "loginNeeded": "Debes iniciar sesión para ver esta página. Por favor, inicia sesión para continuar.",
-      "goToLogin": "Ir a Iniciar Sesión"
+      "goToLogin": "Ir a Iniciar Sesión",
+      "verifying": "Verificando tu cuenta",
+      "pleaseWait": "Espera mientras autenticamos tu sesión",
+      "error": "Error de Autenticación",
+      "errorMessage": "Hubo un problema con la autenticación. Por favor, intenta de nuevo.",
+      "tryAgain": "Intentar de nuevo"
     },
     "login": {
       "title": "Iniciar Sesión en Fury Foods",

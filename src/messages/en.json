@@ -9,12 +9,22 @@
       "about": "About",
       "privacy": "Privacy",
       "terms": "Terms",
-      "contact": "Contact"
+      "contact": "Contact",
+      "quickLinks": "Quick Links",
+      "restaurants": "Restaurants",
+      "legal": "Legal",
+      "faq": "FAQ",
+      "allRightsReserved": "All rights reserved"
     },
     "auth": {
       "required": "Authentication Required",
       "loginNeeded": "You must be logged in to view this page. Please sign in to continue.",
-      "goToLogin": "Go to Login"
+      "goToLogin": "Go to Login",
+      "verifying": "Verifying your account",
+      "pleaseWait": "Please wait while we authenticate your session",
+      "error": "Authentication Error",
+      "errorMessage": "There was a problem with authentication. Please try again.",
+      "tryAgain": "Try Again"
     },
     "login": {
       "title": "Login to Fury Foods",

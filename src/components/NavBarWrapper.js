@@ -9,7 +9,9 @@ export default function NavbarWrapper() {
   const pathname = usePathname();
   const locale = useLocale();
 
-  if (pathname === `/${locale}/login`) return null; // Hide navbar on login page
+  // Hide navbar on login page
+  // The pathname can be either /login or /{locale}/login depending on the localePrefix strategy
+  if (pathname === '/login' || pathname === `/${locale}/login`) return null;
 
   return <Navbar />;
 }

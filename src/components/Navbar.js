@@ -33,7 +33,7 @@ export default function Navbar() {
 
   const isActive = (href) => pathname === href;
   const navLinkClass = (href) =>
-    `flex items-center gap-1 hover:text-orange-200 ${isActive(href) ? 'underline underline-offset-4' : ''}`;
+    `flex items-center gap-1 px-3 py-2 rounded-md transition-all duration-200 hover:bg-orange-600 ${isActive(href) ? 'font-medium text-white bg-orange-600' : 'text-white'}`;
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -47,17 +47,29 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleCartClick = () => {
+    router.push('/cart', { locale });
+    setMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setUserMenuOpen(false);
+    setMenuOpen(false);
+  };
+
   return (
-    <nav className="bg-orange-500 text-white shadow-md sticky top-0 z-50">
+    <nav className="bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-extrabold tracking-tight hover:text-orange-200">
-            Fury Foods
+          <Link href="/" className="text-2xl font-extrabold tracking-tight hover:text-white group flex items-center gap-2">
+            <span className="text-white group-hover:scale-105 transition-transform duration-200">Fury Foods</span>
+            <span className="hidden sm:inline-block text-sm bg-orange-300 text-orange-800 px-2 py-0.5 rounded-full font-semibold">Delicious</span>
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-2">
             <Link href="/" className={navLinkClass('/')}>
               <HomeIcon className="w-5 h-5" />
               {t('home')}
@@ -74,11 +86,16 @@ export default function Navbar() {
             {/* Cart */}
             {user && (
               <button
-                onClick={() => router.push('/cart', { locale })}
-                className="relative flex items-center gap-1 hover:text-orange-200 focus:outline-none"
+                onClick={handleCartClick}
+                className="relative flex items-center gap-1 px-3 py-2 rounded-md transition-all duration-200 hover:bg-orange-600 focus:outline-none"
               >
                 <ShoppingCartIcon className="w-6 h-6" />
-                <span>{t('cart')} ({totalItems})</span>
+                <span>{t('cart')}</span>
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-white text-orange-600 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                    {totalItems}
+                  </span>
+                )}
               </button>
             )}
 
@@ -90,12 +107,12 @@ export default function Navbar() {
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 cursor-pointer hover:text-orange-200 focus:outline-none"
+                  className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-md transition-all duration-200 hover:bg-orange-600 focus:outline-none"
                 >
                   <UserCircleIcon className="w-5 h-5" />
-                  <span>{user.email}</span>
+                  <span className="max-w-[120px] truncate">{user.email}</span>
                   <svg
-                    className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -105,27 +122,24 @@ export default function Navbar() {
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white text-orange-700 rounded shadow-lg z-10">
-                    <div className="px-4 py-2 border-b border-orange-200">
-                      <p className="text-sm font-semibold">{user.role.toUpperCase()}</p>
+                  <div className="absolute right-0 mt-2 w-56 bg-white text-gray-700 rounded-md shadow-xl z-10 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-orange-100 bg-orange-50">
+                      <p className="text-sm font-semibold text-orange-800">{user.role.toUpperCase()}</p>
                       {user.country && <p className="text-xs text-orange-600">{user.country}</p>}
                     </div>
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-2 px-4 py-2 hover:bg-orange-100 hover:text-orange-600"
+                      className="flex items-center gap-2 px-4 py-3 hover:bg-orange-50 text-gray-700 transition-colors duration-200"
                       onClick={() => setUserMenuOpen(false)}
                     >
-                      <Squares2X2Icon className="w-5 h-5" />
+                      <Squares2X2Icon className="w-5 h-5 text-orange-600" />
                       {t('dashboard')}
                     </Link>
                     <button
-                      onClick={() => {
-                        logout();
-                        setUserMenuOpen(false);
-                      }}
-                      className="w-full text-left flex items-center gap-2 px-4 py-2 hover:bg-orange-100 hover:text-orange-600"
+                      onClick={handleLogout}
+                      className="w-full text-left flex items-center gap-2 px-4 py-3 hover:bg-orange-50 text-gray-700 transition-colors duration-200"
                     >
-                      <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                      <ArrowRightOnRectangleIcon className="w-5 h-5 text-orange-600" />
                       {t('logout')}
                     </button>
                   </div>
@@ -134,7 +148,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-2 bg-white text-orange-500 px-4 py-1 rounded hover:bg-orange-100 hover:text-orange-700 font-semibold"
+                className="flex items-center gap-2 bg-white text-orange-600 px-4 py-2 rounded-md hover:bg-orange-100 transition-colors duration-200 font-semibold shadow-sm"
               >
                 <ArrowLeftOnRectangleIcon className="w-5 h-5" />
                 {t('login')}
@@ -147,7 +161,7 @@ export default function Navbar() {
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
-              className="text-white focus:outline-none focus:ring-2 focus:ring-white"
+              className="text-white p-2 rounded-md hover:bg-orange-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white"
             >
               {menuOpen ? (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,67 +179,74 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-orange-600 text-white px-4 py-3 space-y-3">
+        <div className="md:hidden bg-orange-600 text-white px-4 py-4 shadow-lg divide-y divide-orange-500">
           {/* Language Switcher */}
-          <LanguageSwitcher />
+          <div className="py-3 flex justify-center">
+            <LanguageSwitcher />
+          </div>
 
-          <Link href="/" onClick={() => setMenuOpen(false)} className={navLinkClass('/')}>
-            <HomeIcon className="w-5 h-5" />
-            {t('home')}
-          </Link>
-          <Link href="/restaurants" onClick={() => setMenuOpen(false)} className={navLinkClass('/restaurants')}>
-            <BuildingStorefrontIcon className="w-5 h-5" />
-            {t('restaurants')}
-          </Link>
-          <Link href="/orders" onClick={() => setMenuOpen(false)} className={navLinkClass('/orders')}>
-            <ClipboardDocumentListIcon className="w-5 h-5" />
-            {t('orders')}
-          </Link>
+          <div className="py-3">
+            <Link href="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 py-3 hover:text-orange-200 transition-colors duration-200">
+              <HomeIcon className="w-5 h-5" />
+              {t('home')}
+            </Link>
+            <Link href="/restaurants" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 py-3 hover:text-orange-200 transition-colors duration-200">
+              <BuildingStorefrontIcon className="w-5 h-5" />
+              {t('restaurants')}
+            </Link>
+            <Link href="/orders" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 py-3 hover:text-orange-200 transition-colors duration-200">
+              <ClipboardDocumentListIcon className="w-5 h-5" />
+              {t('orders')}
+            </Link>
+          </div>
 
           {user && (
-            <>
+            <div className="py-3">
               <button
-                onClick={() => {
-                  router.push('/cart', { locale });
-                  setMenuOpen(false);
-                }}
-                className="flex items-center gap-2 bg-orange-700 px-3 py-2 rounded hover:bg-orange-800"
+                onClick={handleCartClick}
+                className="flex w-full items-center justify-between gap-2 px-3 py-3 rounded hover:bg-orange-700 transition-colors duration-200"
               >
-                <ShoppingCartIcon className="w-5 h-5" />
-                {t('cart')} ({totalItems})
+                <div className="flex items-center gap-2">
+                  <ShoppingCartIcon className="w-5 h-5" />
+                  {t('cart')}
+                </div>
+                {totalItems > 0 && (
+                  <span className="bg-white text-orange-600 rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold">
+                    {totalItems}
+                  </span>
+                )}
               </button>
               <Link
                 href="/dashboard"
-                className="flex items-center gap-2 bg-orange-700 px-3 py-2 rounded hover:bg-orange-800"
+                className="flex items-center gap-2 px-3 py-3 rounded hover:bg-orange-700 transition-colors duration-200"
                 onClick={() => setMenuOpen(false)}
               >
                 <Squares2X2Icon className="w-5 h-5" />
                 {t('dashboard')}
               </Link>
-            </>
+            </div>
           )}
 
-          {user ? (
-            <button
-              onClick={() => {
-                logout();
-                setMenuOpen(false);
-              }}
-              className="flex w-full items-center gap-2 bg-white text-orange-600 px-3 py-2 rounded"
-            >
-              <ArrowRightOnRectangleIcon className="w-5 h-5" />
-              {t('logout')}
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              className="flex items-center gap-2 bg-white text-orange-600 px-3 py-2 rounded"
-              onClick={() => setMenuOpen(false)}
-            >
-              <ArrowLeftOnRectangleIcon className="w-5 h-5" />
-              {t('login')}
-            </Link>
-          )}
+          <div className="py-3">
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-2 bg-white text-orange-600 px-4 py-3 rounded-md font-medium"
+              >
+                <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                {t('logout')}
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center gap-2 bg-white text-orange-600 px-4 py-3 rounded-md font-medium"
+                onClick={() => setMenuOpen(false)}
+              >
+                <ArrowLeftOnRectangleIcon className="w-5 h-5" />
+                {t('login')}
+              </Link>
+            )}
+          </div>
         </div>
       )}
     </nav>

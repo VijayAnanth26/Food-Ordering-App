@@ -1,7 +1,8 @@
 'use client';
 
 import { createContext, useState, useContext, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
+import { useLocale } from 'next-intl';
 
 const AuthContext = createContext();
 
@@ -10,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const locale = useLocale();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -42,8 +44,8 @@ export const AuthProvider = ({ children }) => {
 
     if (match) {
       setUser(match);
-      sessionStorage.setItem('user', JSON.stringify(match)); // 🔁 persist for session only
-      router.push('/');
+      sessionStorage.setItem('user', JSON.stringify(match));
+      router.push('/', { locale });
     } else {
       alert('Invalid credentials. Please try again.');
     }
@@ -52,7 +54,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     sessionStorage.removeItem('user');
     setUser(null);
-    router.push('/login');
+    router.push('/login', { locale });
   };
 
   if (loading) {
@@ -60,7 +62,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, users }}>
+    <AuthContext.Provider value={{ user, login, logout, users, loading }}>
       {children}
     </AuthContext.Provider>
   );

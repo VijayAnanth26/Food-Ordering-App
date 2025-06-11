@@ -20,6 +20,7 @@ export default function CartPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [restaurant, setRestaurant] = useState(null);
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   const canPlaceOrder = useMemo(() => {
     const role = user?.role?.toLowerCase();
@@ -73,10 +74,12 @@ export default function CartPage() {
       if (!res.ok) throw new Error('Failed to place order');
 
       const newOrder = await res.json();
-      router.push(`/${locale}/orders?newOrderId=${newOrder._id}`);
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      clearCart();
+      setOrderPlaced(true);
+      
+      setTimeout(() => {
+        router.push(`/${locale}/orders?newOrderId=${newOrder._id}`);
+        clearCart();
+      }, 2000);
     } catch (error) {
       console.error('Error placing order:', error);
       alert(t('orderError'));
@@ -89,6 +92,12 @@ export default function CartPage() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white p-6 md:p-10">
       <div className="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-2xl shadow-xl transition-all duration-300">
         <h1 className="text-4xl font-bold text-orange-700 mb-6 text-center">{t('title')}</h1>
+
+        {orderPlaced && (
+          <div className="mb-6 p-4 bg-green-100 text-green-700 rounded-lg text-center animate-pulse">
+            {t('orderSuccess')}
+          </div>
+        )}
 
         {cart.length > 0 && restaurant && (
           <div className="text-center mb-8 p-4 bg-orange-50 rounded-lg">
